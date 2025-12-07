@@ -1,0 +1,106 @@
+.placeholder-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  min-height: calc(100vh - 80px);
+}
+
+.placeholder-content {
+  background-color: var(--color-card);
+  border-radius: 20px;
+  padding: 48px 32px;
+  text-align: center;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+  border: 1px solid var(--color-border);
+}
+
+.placeholder-icon {
+  font-size: 80px;
+  margin-bottom: 24px;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+.placeholder-content h1 {
+  color: var(--color-text);
+  margin: 0 0 16px 0;
+  font-size: 32px;
+}
+
+.placeholder-description {
+  color: var(--color-text);
+  opacity: 0.8;
+  margin: 0 0 32px 0;
+  font-size: 18px;
+  line-height: 1.6;
+}
+
+.placeholder-actions {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  margin-bottom: 40px;
+}
+
+.placeholder-button {
+  padding: 14px 28px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  border: none;
+}
+
+.placeholder-button.primary {
+  background-color: var(--color-primary);
+  color: var(--color-white);
+}
+
+.placeholder-button.primary:hover {
+  background-color: #ec4899;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(244, 114, 182, 0.3);
+}
+
+.placeholder-button.secondary {
+  background-color: var(--color-border);
+  color: var(--color-text);
+}
+
+.placeholder-button.secondary:hover {
+  background-color: var(--color-text);
+  color: var(--color-card);
+  transform: translateY(-2px);
+}
+
+.placeholder-info {
+  background-color: var(--color-border);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.placeholder-info p {
+  color: var(--color-text);
+  margin: 8px 0;
+  font-size: 15px;
+}
+
+.placeholder-info p:first-child {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+@media (max-width: 768px) {
+  .placeholder-actions {
+    flex-direction: column;
+  }
+  
+  .placeholder-button {
+    width: 100%;
+  }
+}
