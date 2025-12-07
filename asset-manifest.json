@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/kiks-admin-panel/static/css/main.24135ca5.css",
+    "main.js": "/kiks-admin-panel/static/js/main.6e321390.js",
+    "index.html": "/kiks-admin-panel/index.html",
+    "main.24135ca5.css.map": "/kiks-admin-panel/static/css/main.24135ca5.css.map",
+    "main.6e321390.js.map": "/kiks-admin-panel/static/js/main.6e321390.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.24135ca5.css",
+    "static/js/main.6e321390.js"
+  ]
+}
