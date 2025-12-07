@@ -176,9 +176,9 @@ const SearchUserPage = () => {
                 {banLoading ? (
                   <span className="spinner small"></span>
                 ) : userData.blocked_status ? (
-                  '🔓 Разблокировать пользователя'
+                  'Разблокировать пользователя'
                 ) : (
-                  '🚫 Заблокировать пользователя'
+                  'Заблокировать пользователя'
                 )}
               </button>
             </div>
