@@ -1,29 +1,115 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/NonWorkingDaysPage.css';
+const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 
 const NonWorkingDaysPage = () => {
-  const { isDarkMode } = useTheme();
+  const [club, setClub] = useState('kiks1');
   const [date, setDate] = useState('');
   const [reason, setReason] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fetching, setFetching] = useState(true);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
   
-  // Состояние для диалога подтверждения
+  // Состояние для диалога подтверждения удаления
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dayToDelete, setDayToDelete] = useState(null);
   
   // Моковые данные для демонстрации
-  const [nonWorkingDays, setNonWorkingDays] = useState([
-    { id: 1, date: '15.03.2026', reason: 'Техническое обслуживание' },
-    { id: 2, date: '01.05.2026', reason: 'Праздничный день' },
-    { id: 3, date: '09.05.2026', reason: 'День Победы' },
-    { id: 4, date: '12.06.2026', reason: 'День России' },
-    { id: 5, date: '31.12.2026', reason: 'Новогодние праздники' }
-  ]);
+  const [nonWorkingDays, setNonWorkingDays] = useState([]);
+  // Загрузка данных при открытии страницы
+  useEffect(() => {
+    fetchDayOffs();
+  }, []);
+
+  // Функция для загрузки нерабочих дней с API
+  const fetchDayOffs = async () => {
+    try {
+      setFetching(true);
+      setError('');
+      
+      const response = await fetch(`${API_BASE_URL}/get-dayoffs`);
+      
+      if (!response.ok) {
+        throw new Error(`Ошибка API: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Преобразуем данные из API в нужный формат
+      const formattedDays = data.map(day => ({
+        id: day.id || day._id,
+        club: day.club || 'all',
+        date: formatDateToDisplay(day.date),
+        reason: day.reason || '',
+        createdAt: formatDateTime(day.createdAt) || formatDateTime(new Date())
+      }));
+      
+      setNonWorkingDays(formattedDays);
+    } catch (err) {
+      console.error('Ошибка загрузки нерабочих дней:', err);
+      setError(`Не удалось загрузить нерабочие дни: ${err.message}`);
+      
+      // Для демонстрации, если API недоступен
+      // setNonWorkingDays(getMockData());
+    } finally {
+      setFetching(false);
+    }
+  };
+
+  // Форматирование даты из API (предположим, что API возвращает в формате YYYY-MM-DD)
+  const formatDateToDisplay = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+      // Если дата уже в формате DD.MM.YYYY
+      if (dateString.includes('.')) {
+        return dateString;
+      }
+      
+      // Если дата в формате YYYY-MM-DD
+      const [year, month, day] = dateString.split('-');
+      return `${day}.${month}.${year}`;
+    } catch (err) {
+      console.error('Ошибка форматирования даты:', err);
+      return dateString;
+    }
+  };
+
+  // Форматирование даты для API (DD.MM.YYYY → YYYY-MM-DD)
+  const formatDateForAPI = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+      const [day, month, year] = dateString.split('.');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    } catch (err) {
+      console.error('Ошибка форматирования даты для API:', err);
+      return dateString;
+    }
+  };
+
+  // Форматирование даты и времени
+  const formatDateTime = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+      const date = new Date(dateString);
+      const day = date.getDate().toString().padStart(2, '0');
+      const month = (date.getMonth() + 1).toString().padStart(2, '0');
+      const year = date.getFullYear();
+      const hours = date.getHours().toString().padStart(2, '0');
+      const minutes = date.getMinutes().toString().padStart(2, '0');
+      
+      return `${day}.${month}.${year} ${hours}:${minutes}`;
+    } catch (err) {
+      console.error('Ошибка форматирования даты и времени:', err);
+      return '';
+    }
+  };
 
   // Валидация даты
   const validateDate = (dateStr) => {
@@ -51,11 +137,26 @@ const NonWorkingDaysPage = () => {
     }
 
     // Проверка на дубликат
-    if (nonWorkingDays.some(day => day.date === dateStr)) {
-      return 'Эта дата уже добавлена как нерабочий день';
+    const isDuplicate = nonWorkingDays.some(day => 
+      day.club === club && 
+      day.date === dateStr
+    );
+
+    if (isDuplicate) {
+      const clubName = getClubName(club);
+      return `${clubName} уже закрыт на ${dateStr}`;
     }
 
     return '';
+  };
+
+  // Получение названия клуба
+  const getClubName = (clubCode) => {
+    switch(clubCode) {
+      case 'kiks1': return 'Марата';
+      case 'kiks2': return 'Каменноостровский';
+      default: return '';
+    }
   };
 
   // Обработка отправки формы
@@ -73,28 +174,64 @@ const NonWorkingDaysPage = () => {
     setError('');
     
     // Имитация запроса на сервер
-    await new Promise(resolve => setTimeout(resolve, 500));
+    // await new Promise(resolve => setTimeout(resolve, 500));
     
-    const newDay = {
-      id: Date.now(),
-      date: date,
-      reason: reason.trim() || ''
-    };
+    try {
+      // Формируем данные для отправки
+      const dayOffData = {
+        club: club,
+        date: formatDateForAPI(date),
+        reason: reason.trim() || '',
+        // Добавляем timestamp для создания
+        createdAt: new Date().toISOString()
+      };
 
-    // Сортировка по дате (от ближайшей к дальней)
-    const updatedDays = [...nonWorkingDays, newDay].sort((a, b) => {
-      const [dayA, monthA, yearA] = a.date.split('.').map(Number);
-      const [dayB, monthB, yearB] = b.date.split('.').map(Number);
-      const dateA = new Date(yearA, monthA - 1, dayA);
-      const dateB = new Date(yearB, monthB - 1, dayB);
-      return dateA - dateB;
-    });
+      // Отправляем запрос на создание нерабочего дня
+      const response = await fetch(`${API_BASE_URL}/create-dayoff`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dayOffData)
+      });
 
-    setNonWorkingDays(updatedDays);
-    setDate('');
-    setReason('');
-    setSuccess('Нерабочий день успешно добавлен');
-    setLoading(false);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Ошибка API: ${response.status}`);
+      }
+
+      const newDay = await response.json();
+
+      // Форматируем новый день для отображения
+      const formattedDay = {
+        id: newDay.id || newDay._id,
+        club: newDay.club || club,
+        date: formatDateToDisplay(newDay.date) || date,
+        reason: newDay.reason || reason.trim() || '',
+        createdAt: formatDateTime(newDay.createdAt) || formatDateTime(new Date())
+      };
+
+      // Добавляем новый день в список
+      setNonWorkingDays(prev => {
+        const updatedDays = [...prev, formattedDay].sort((a, b) => {
+          const [dayA, monthA, yearA] = a.date.split('.').map(Number);
+          const [dayB, monthB, yearB] = b.date.split('.').map(Number);
+          const dateA = new Date(yearA, monthA - 1, dayA);
+          const dateB = new Date(yearB, monthB - 1, dayB);
+          return dateA - dateB;
+        });
+        return updatedDays;
+      });
+
+      resetForm();
+      setSuccess(`Нерабочий день успешно добавлен: ${getClubName(club)}, ${date}`);
+      
+    } catch (err) {
+      console.error('Ошибка добавления нерабочего дня:', err);
+      setError(`Не удалось добавить нерабочий день: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
   };
 
   // Открытие диалога удаления
@@ -111,19 +248,50 @@ const NonWorkingDaysPage = () => {
     setLoading(true);
     setDialogOpen(false);
     
-    // Имитация запроса на сервер
-    await new Promise(resolve => setTimeout(resolve, 400));
-    
-    setNonWorkingDays(prev => prev.filter(day => day.id !== dayToDelete.id));
-    setSuccess(`Нерабочий день ${dayToDelete.date} удален`);
-    setDayToDelete(null);
-    setLoading(false);
+    try {
+      // Отправляем запрос на удаление
+      const response = await fetch(`${API_BASE_URL}/delete-dayoff/${dayToDelete.id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Ошибка API: ${response.status}`);
+      }
+
+      // Удаляем день из списка
+      setNonWorkingDays(prev => prev.filter(day => day.id !== dayToDelete.id));
+      setSuccess(`Нерабочий день удален: ${getClubName(dayToDelete.club)}, ${dayToDelete.date}`);
+      
+    } catch (err) {
+      console.error('Ошибка удаления нерабочего дня:', err);
+      setError(`Не удалось удалить нерабочий день: ${err.message}`);
+    } finally {
+      setDayToDelete(null);
+      setLoading(false);
+    }
   };
 
   // Отмена удаления
   const handleDeleteCancel = () => {
     setDialogOpen(false);
     setDayToDelete(null);
+  };
+
+  // Сброс формы
+  const resetForm = () => {
+    setClub('all');
+    setDate('');
+    setReason('');
+  };
+
+  // Получение сегодняшней даты в нужном формате
+  const getTodayDate = () => {
+    const today = new Date();
+    const day = String(today.getDate()).padStart(2, '0');
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const year = today.getFullYear();
+    return `${day}.${month}.${year}`;
   };
 
   // Фильтрация только будущих дат
@@ -135,6 +303,25 @@ const NonWorkingDaysPage = () => {
     return dateObj >= today;
   });
 
+  // Группировка дней по клубу для отображения
+  const groupedDays = futureDays.reduce((groups, day) => {
+    const key = day.club;
+    if (!groups[key]) {
+      groups[key] = [];
+    }
+    groups[key].push(day);
+    return groups;
+  }, {});
+
+  // Моковые данные для демонстрации (если API недоступно)
+  const getMockData = () => [
+    { id: 1, club: 'kiks1', date: '15.03.2026', reason: 'Техническое обслуживание', createdAt: '10.03.2024 10:30' },
+    { id: 2, club: 'kiks1', date: '01.05.2026', reason: 'Праздничный день', createdAt: '01.01.2024 00:00' },
+    { id: 3, club: 'kiks1', date: '09.05.2026', reason: 'День Победы', createdAt: '01.01.2024 00:00' },
+    { id: 4, club: 'kiks2', date: '12.06.2026', reason: 'День России', createdAt: '01.01.2024 00:00' },
+    { id: 5, club: 'kiks2', date: '31.12.2026', reason: 'Новогодние праздники', createdAt: '01.12.2024 09:15' }
+  ];
+
   return (
     <div className="non-working-container">
       <BackButton />
@@ -142,14 +329,29 @@ const NonWorkingDaysPage = () => {
       <div className="non-working-header">
         <h1>Нерабочие дни</h1>
         <p className="page-subtitle">
-          Добавляй даты, когда клуб будет закрыт
+          Добавляй даты, когда клубы будут закрыты
         </p>
       </div>
 
       <div className="form-section">
         <div className="form-card">
           <form onSubmit={handleSubmit} className="non-working-form">
-            <div className="form-row">
+            <div className="form-fields">
+              <div className="form-group">
+                <label htmlFor="club" className="form-label">
+                  Клуб
+                </label>
+                <select
+                  id="club"
+                  value={club}
+                  onChange={(e) => setClub(e.target.value)}
+                  className="club-select"
+                >
+                  <option value="kiks1">Марата</option>
+                  <option value="kiks2">Каменноостровский</option>
+                </select>
+              </div>
+
               <div className="form-group">
                 <label htmlFor="date" className="form-label">
                   Дата
@@ -159,8 +361,27 @@ const NonWorkingDaysPage = () => {
                   type="text"
                   value={date}
                   onChange={(e) => {
-                    setDate(e.target.value);
-                    setError('');
+                    const inputValue = e.target.value;
+                    let formattedValue = '';
+
+                    // Оставляем только цифры
+                    const digits = inputValue.replace(/\D/g, '');
+
+                    // Формируем строку по маске ДД.ММ.ГГГГ
+                    for (let i = 0; i < digits.length; i++) {
+                      if (i === 2 || i === 4) {
+                        formattedValue += '.';
+                      }
+                      formattedValue += digits[i];
+                    }
+
+                    // Ограничиваем длину до 10 символов
+                    if (formattedValue.length <= 10) {
+                      setDate(formattedValue);
+                      setError('');
+                    }
+                    // setDate(e.target.value);
+                    // setError('');
                   }}
                   className="date-input"
                   placeholder="ДД.ММ.ГГГГ"
@@ -171,7 +392,7 @@ const NonWorkingDaysPage = () => {
 
               <div className="form-group">
                 <label htmlFor="reason" className="form-label">
-                  Причина (необязательно)
+                  Причина
                 </label>
                 <input
                   id="reason"
@@ -183,21 +404,6 @@ const NonWorkingDaysPage = () => {
                   maxLength="100"
                 />
               </div>
-
-              <button
-                type="submit"
-                className="add-button"
-                disabled={loading || !date}
-              >
-                {loading ? (
-                  <>
-                    <span className="spinner"></span>
-                    Добавляю...
-                  </>
-                ) : (
-                  'Добавить'
-                )}
-              </button>
             </div>
 
             {error && (
@@ -211,6 +417,23 @@ const NonWorkingDaysPage = () => {
                 {success}
               </div>
             )}
+
+            <div className="form-actions">
+              <button
+                type="submit"
+                className="add-button"
+                disabled={loading || !date}
+              >
+                {loading ? (
+                  <>
+                    <span className="spinner"></span>
+                    Добавляем...
+                  </>
+                ) : (
+                  'Добавить нерабочий день'
+                )}
+              </button>
+            </div>
           </form>
         </div>
       </div>
@@ -223,51 +446,62 @@ const NonWorkingDaysPage = () => {
               {futureDays.length} дней
             </span>
           </div>
-          
         </div>
-        
 
-        {futureDays.length === 0 ? (
+        {fetching ? (
+          <div className="loading-state">
+            <div className="loading-spinner"></div>
+            <p>Загрузка нерабочих дней...</p>
+          </div>
+        ) : futureDays.length === 0 ? (
           <div className="empty-state">
             <p>Нет запланированных нерабочих дней</p>
+            <p className="empty-hint">Все клубы работают по обычному графику</p>
           </div>
         ) : (
           <div className="days-list">
-            {futureDays.map((day) => (
-              <div key={day.id} className="day-item">
-                <div className="day-date">
-                  <span className="date-text">{day.date}</span>
-                  {day.reason && (
-                    <span className="day-reason">— {day.reason}</span>
-                  )}
+            {Object.keys(groupedDays).map(clubKey => (
+              <div key={clubKey} className="club-group">
+                <div className="club-header">
+                  <h3 className="club-title">{getClubName(clubKey)}</h3>
+                  <span className="club-count">{groupedDays[clubKey].length} дней</span>
                 </div>
-                <button
-                  onClick={() => handleDeleteClick(day.id)}
-                  className="delete-button"
-                  title="Удалить"
-                  disabled={loading}
-                >
-                  <svg 
-                    viewBox="0 0 24 24" 
-                    fill="currentColor"
-                    width="16" 
-                    height="16"
-                  >
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                  </svg>
-                </button>
+                <div className="club-days">
+                  {groupedDays[clubKey].map((day) => (
+                    <div key={day.id} className="day-item">
+                      <div className="day-info">
+                        <span className="day-date">{day.date}</span>
+                        {day.reason && (
+                          <span className="day-reason">{day.reason}</span>
+                        )}
+                      </div>
+                      <button
+                        onClick={() => handleDeleteClick(day.id)}
+                        className="delete-button"
+                        title="Удалить"
+                        disabled={loading}
+                      >
+                        <svg 
+                          viewBox="0 0 24 24" 
+                          fill="currentColor"
+                          width="16" 
+                          height="16"
+                        >
+                          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                        </svg>
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
             ))}
           </div>
         )}
 
         <div className="list-footer">
-            <p className="disclaimer">
-            В эти дни клуб будет закрыт, бронь будет недоступна 
+          <p className="disclaimer">
+            Прошедшие даты автоматически скрываются из списка
           </p>
-          {/* <p className="disclaimer">
-            Прошедшие даты автоматически удаляются из списка
-          </p> */}
         </div>
       </div>
 
@@ -276,8 +510,8 @@ const NonWorkingDaysPage = () => {
         isOpen={dialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Удаление нерабочего дня"
-        message={`Вы уверены, что хотите удалить нерабочий день ${dayToDelete?.date}${dayToDelete?.reason ? ` (${dayToDelete.reason})` : ''}?`}
+        title="Внимание"
+        message={`Удалить нерабочий день?\n${getClubName(dayToDelete?.club)}, ${dayToDelete?.date}${dayToDelete?.reason ? ` (${dayToDelete.reason})` : ''}`}
         confirmText="Удалить"
         cancelText="Отмена"
       />

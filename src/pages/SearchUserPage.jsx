@@ -62,6 +62,14 @@ const SearchUserPage = () => {
     setError('');
   };
 
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() возвращает 0–11
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
   return (
     <div className="search-container">
         <BackButton />
@@ -162,7 +170,7 @@ const SearchUserPage = () => {
               
               <div className="info-item">
                 <span className="info-label">Дата регистрации:</span>
-                <span className="info-value">{userData.createdAt}</span>
+                <span className="info-value">{formatDate(userData.createdAt)}</span>
               </div>
               
             </div>

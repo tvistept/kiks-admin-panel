@@ -78,3 +78,46 @@ button:focus, .menu-card:focus {
 .menu-card:focus:not(:focus-visible) {
   outline: none;
 }
+
+/* Font Awesome иконки */
+.icon {
+  display: inline-block;
+  vertical-align: middle;
+}
+
+/* Плавные переходы для иконок */
+svg {
+  transition: fill 0.3s ease, color 0.3s ease, transform 0.3s ease;
+}
+
+/* Размеры иконок */
+.fa-xs { font-size: 0.75em; }
+.fa-sm { font-size: 0.875em; }
+.fa-lg { font-size: 1.25em; }
+.fa-2x { font-size: 2em; }
+.fa-3x { font-size: 3em; }
+
+/* Цвета иконок */
+.icon-primary {
+  color: var(--color-primary);
+}
+
+.icon-secondary {
+  color: var(--color-secondary);
+}
+
+.icon-success {
+  color: #10b981;
+}
+
+.icon-warning {
+  color: #f59e0b;
+}
+
+.icon-danger {
+  color: #ef4444;
+}
+
+.icon-info {
+  color: #3b82f6;
+}

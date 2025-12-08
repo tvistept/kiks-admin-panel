@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import ThemeToggle from '../components/ThemeToggle';
 import '../styles/LoginPage.css';
+import kiksLogo from '../images/kiks_logo.png';
 
 const LoginPage = ({ onLogin }) => {
   const [accessCode, setAccessCode] = useState('');
@@ -25,6 +26,13 @@ const LoginPage = ({ onLogin }) => {
         <ThemeToggle />
       </div>
       <div className="login-card">
+        <div className="logo-container">
+          <img 
+            src={kiksLogo} 
+            alt="KIKS Бильярдный клуб" 
+            className="login-logo"
+          />
+        </div>
         <h1 className="login-title">KIKS</h1>
         <p className="login-subtitle">Введи код доступа для входа в систему</p>
         
