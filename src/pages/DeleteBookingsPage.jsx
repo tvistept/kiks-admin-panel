@@ -93,10 +93,6 @@ const DeleteBookingsPage = () => {
       } finally {
         setLoading(false);
       }
-      
-      
-      
-      
     } else {
       const dateError = validateDate(searchDate);
       if (dateError) {
@@ -105,26 +101,25 @@ const DeleteBookingsPage = () => {
         return;
       }
       
-      // Имитация запроса на сервер
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      let results = bookings.filter(booking => 
-        booking.booking_date === searchDate
-      );
-      
-      if (searchClub !== 'all') {
-        results = results.filter(booking => 
-          booking.club_id === searchClub
-        );
-      }
-      
-      setSearchResults(results);
-      
-      if (results.length === 0) {
-        const clubText = searchClub === 'all' ? '' : ` в клубе ${searchClub === 'kiks1' ? 'Kiks 1' : 'Kiks 2'}`;
-        setError(`Брони на ${searchDate}${clubText} не найдены`);
-      } else {
-        setSuccess(`Найдено броней: ${results.length}`);
+      try {
+        const response = await fetch(`https://kiks-app.ru:5000/api/get-bookings-by-date?club_id=${searchClub}&booking_date=${searchDate}`);
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки броней по дате');
+        }
+        const results = await response.json();
+        setSearchResults(results);
+
+        if (results.length === 0) {
+          const clubText = searchClub === 'all' ? '' : ` в клубе ${searchClub === 'kiks1' ? 'на Марата' : 'на Каменноостровском'}`;
+          setError(`Брони на ${searchDate}${clubText} не найдены`);
+        } else {
+          setSuccess(`Найдено броней: ${results.length}`);
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error('Ошибка при загрузке пользователя:', err);
+      } finally {
+        setLoading(false);
       }
     }
     
@@ -172,15 +167,23 @@ const DeleteBookingsPage = () => {
     setBookingToDelete(null);
   };
 
-  // Форматирование времени
-  const formatTimeDisplay = (booking) => {
-    return `${booking.time} - ${booking.endTime}`;
-  };
-
   // Получение названия клуба
   const getClubName = (clubCode) => {
     return clubCode === 'kiks1' ? 'Марата' : 'Каменноостровский';
   };
+
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() возвращает 0–11
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
+  const formatTime = (time) => {
+    const trimmed = time.substring(0, 5);
+    return trimmed;
+  }
 
   return (
     <div className="delete-bookings-container">
@@ -362,10 +365,10 @@ const DeleteBookingsPage = () => {
                       </span>
                     </td>
                     <td className="date-cell">
-                      <span className="date-text">{booking.booking_date}</span>
+                      <span className="date-text">{formatDate(booking.booking_date)}</span>
                     </td>
                     <td className="time-cell">
-                      <span className="time-text">{booking.time}</span>
+                      <span className="time-text">{formatTime(booking.time)}</span>
                     </td>
                     <td className="table-cell">
                       <span className="table-number">Стол {booking.table}</span>
@@ -423,8 +426,8 @@ const DeleteBookingsPage = () => {
         isOpen={dialogOpen}
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
-        title="Удаление брони"
-        message={`Вы уверены, что хотите удалить бронь?\n${bookingToDelete?.user_name}, ${getClubName(bookingToDelete?.club_id)}, ${bookingToDelete?.booking_date} ${bookingToDelete?.time}`}
+        title="Внимание"
+        message={`Удалить бронь?\n${bookingToDelete?.user_name}, ${getClubName(bookingToDelete?.club_id)}, ${bookingToDelete?.booking_date} ${bookingToDelete?.time}`}
         confirmText="Удалить бронь"
         cancelText="Отмена"
       />
