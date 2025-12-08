@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 // import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/BackButton';
 import '../styles/SearchUserPage.css';
+const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 
 const SearchUserPage = () => {
 //   const { isDarkMode } = useTheme();
@@ -24,11 +25,12 @@ const SearchUserPage = () => {
     setUserData(null);
 
     try {
-      const response = await fetch(`https://kiks-app.ru:5000/api/get-user?chat_id=${chatId}`);
+      const response = await fetch(`${API_BASE_URL}/get-user?chat_id=${chatId}`);
       if (!response.ok) {
         throw new Error('Ошибка загрузки пользователя');
       }
       const data = await response.json();
+      // const data = getMockData();
       const user = Array.isArray(data) ? data[0] : data;
       setUserData(user); // Сохраняем данные в состоянии
     } catch (err) {
@@ -42,18 +44,36 @@ const SearchUserPage = () => {
 
   const handleBanToggle = async () => {
     if (!userData) return;
-
     setBanLoading(true);
-    
-    // Имитация запроса на сервер
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    setUserData(prev => ({
-      ...prev,
-      blocked_status: !prev.blocked_status
-    }));
-    
-    setBanLoading(false);
+    let newBlockedStatus = userData.blocked_status ? 0 : 1;
+    try {
+      // const response = await fetch(`${API_BASE_URL}/update-blocked-status?chat_id=${userData.chat_id}&blocked_status=${newBlockedStatus}`);
+      const response = await fetch(`${API_BASE_URL}/update-blocked-status`, {
+        method: 'PATCH', 
+        headers: {
+          'Content-Type': 'application/json', 
+        },
+        body: JSON.stringify({ 
+          chat_id: userData.chat_id,
+          blocked_status: newBlockedStatus 
+        })
+      });
+      
+      if (!response.ok) {
+        throw new Error('Ошибка обновления статуса пользователя');
+      }
+      // Имитация запроса на сервер
+      setUserData(prev => ({
+        ...prev,
+        blocked_status: newBlockedStatus
+      }));
+
+    } catch (err) {
+      setError(err.message);
+      console.error('Ошибка обновления статуса пользователя:', err);
+    } finally {
+      setBanLoading(false);
+    }
   };
 
   const handleClear = () => {
@@ -69,6 +89,19 @@ const SearchUserPage = () => {
     const year = date.getFullYear();
     return `${day}-${month}-${year}`;
   }
+
+  const getMockData = () => [
+   {
+    "id": 4178,
+    "chat_id": "93753787",
+    "firstName": "липкий плот",
+    "phone": "89995280695",
+    "user_name": "tvistept",
+    "blocked_status": null,
+    "createdAt": "2025-12-04T17:12:24.509Z",
+    "updatedAt": "2025-12-04T17:12:49.912Z"
+    }
+  ];
 
   return (
     <div className="search-container">
