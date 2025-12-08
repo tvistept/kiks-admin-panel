@@ -10,6 +10,7 @@ const ThemeToggle = () => {
       onClick={toggleTheme}
       className="theme-toggle"
       aria-label={isDarkMode ? 'Переключить на светлую тему' : 'Переключить на темную тему'}
+      title={isDarkMode ? 'Переключить на светлую тему' : 'Переключить на темную тему'}
     >
       {isDarkMode ? (
         // Иконка солнца для светлой темы

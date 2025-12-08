@@ -507,8 +507,7 @@
     flex-direction: column;
   }
   
-  .submit-button,
-  .clear-button {
+  .submit-button {
     width: 100%;
   }
 }

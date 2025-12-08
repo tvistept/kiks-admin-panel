@@ -20,72 +20,8 @@ const DeleteBookingsPage = () => {
   // Состояние для диалога подтверждения удаления
   const [dialogOpen, setDialogOpen] = useState(false);
   const [bookingToDelete, setBookingToDelete] = useState(null);
-  
-  // Моковые данные для демонстрации
-  const mockBookings = [
-    {
-      id: 1,
-      userName: 'Иван Иванов',
-      chatId: '123456789',
-      club: 'kiks2',
-      date: '25.03.2024',
-      time: '14:00',
-      endTime: '16:00',
-      hours: 2,
-      table: '4',
-      createdAt: '20.03.2026 10:30'
-    },
-    {
-      id: 2,
-      userName: 'Анна Петрова',
-      chatId: '987654321',
-      club: 'kiks2',
-      date: '25.03.2024',
-      time: '18:00',
-      endTime: '20:00',
-      hours: 2,
-      table: '6',
-      createdAt: '22.03.2026 14:15'
-    },
-    {
-      id: 3,
-      userName: 'Сергей Сидоров',
-      chatId: '555555555',
-      club: 'kiks1',
-      date: '26.03.2024',
-      time: '20:00',
-      endTime: '22:00',
-      hours: 2,
-      table: '5',
-      createdAt: '23.03.2026 09:45'
-    },
-    {
-      id: 4,
-      userName: 'Мария Козлова',
-      chatId: '111222333',
-      club: 'kiks2',
-      date: '27.03.2024',
-      time: '16:00',
-      endTime: '18:00',
-      hours: 2,
-      table: '7',
-      createdAt: '24.03.2026 11:20'
-    },
-    {
-      id: 5,
-      userName: 'Алексей Новиков',
-      chatId: '123456789',
-      club: 'kiks1',
-      date: '28.03.2024',
-      time: '12:00',
-      endTime: '14:00',
-      hours: 2,
-      table: '3',
-      createdAt: '25.03.2026 16:40'
-    }
-  ];
 
-  const [bookings, setBookings] = useState(mockBookings);
+  const [bookings, setBookings] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
 
   // Валидация даты
@@ -115,12 +51,8 @@ const DeleteBookingsPage = () => {
   const validateChatId = (chatId) => {
     if (!chatId.trim()) return 'Введите chat_id для поиска';
     
-    if (!/^\d+$/.test(chatId)) {
-      return 'Chat_id должен содержать только цифры';
-    }
-    
-    if (chatId.length < 5) {
-      return 'Chat_id должен содержать минимум 5 цифр';
+    if (!/^-?\d+$/.test(chatId)) {
+      return 'Chat_id должен содержать только цифры и, при необходимости, один знак минус в начале';
     }
     
     return '';
@@ -141,21 +73,30 @@ const DeleteBookingsPage = () => {
         setLoading(false);
         return;
       }
-      
-      // Имитация запроса на сервер
-      await new Promise(resolve => setTimeout(resolve, 600));
-      
-      const results = bookings.filter(booking => 
-        booking.chatId === searchChatId
-      );
-      
-      setSearchResults(results);
-      
-      if (results.length === 0) {
-        setError(`Брони с chat_id ${searchChatId} не найдены`);
-      } else {
-        setSuccess(`Найдено броней: ${results.length}`);
+
+      try {
+        const response = await fetch(`https://kiks-app.ru:5000/api/get-bookings-by-chat-id?chat_id=${searchChatId}`);
+        if (!response.ok) {
+          throw new Error('Ошибка загрузки броней по chat_id');
+        }
+        const results = await response.json();
+        setSearchResults(results);
+
+        if (results.length === 0) {
+          setError(`Брони с chat_id ${searchChatId} не найдены`);
+        } else {
+          setSuccess(`Найдено броней: ${results.length}`);
+        }
+      } catch (err) {
+        setError(err.message);
+        console.error('Ошибка при загрузке пользователя:', err);
+      } finally {
+        setLoading(false);
       }
+      
+      
+      
+      
     } else {
       const dateError = validateDate(searchDate);
       if (dateError) {
@@ -168,12 +109,12 @@ const DeleteBookingsPage = () => {
       await new Promise(resolve => setTimeout(resolve, 600));
       
       let results = bookings.filter(booking => 
-        booking.date === searchDate
+        booking.booking_date === searchDate
       );
       
       if (searchClub !== 'all') {
         results = results.filter(booking => 
-          booking.club === searchClub
+          booking.club_id === searchClub
         );
       }
       
@@ -220,7 +161,7 @@ const DeleteBookingsPage = () => {
     // Удаляем из результатов поиска
     setSearchResults(prev => prev.filter(b => b.id !== bookingToDelete.id));
     
-    setSuccess(`Бронь удалена: ${bookingToDelete.userName}, ${bookingToDelete.date} ${bookingToDelete.time}`);
+    setSuccess(`Бронь удалена: ${bookingToDelete.user_name}, ${bookingToDelete.booking_date} ${bookingToDelete.time}`);
     setBookingToDelete(null);
     setLoading(false);
   };
@@ -409,19 +350,19 @@ const DeleteBookingsPage = () => {
               </thead>
               <tbody>
                 {searchResults.map((booking) => (
-                  <tr key={booking.id} className="booking-row">
+                  <tr key={booking.booking_id} className="booking-row">
                     <td className="user-cell">
                       <div className="user-info">
-                        <span className="user-name">{booking.userName}</span>
+                        <span className="user-name">{booking.user_name}</span>
                       </div>
                     </td>
                     <td className="club-cell">
-                      <span className={`club-badge ${booking.club}`}>
-                        {getClubName(booking.club)}
+                      <span className={`club-badge ${booking.club_id}`}>
+                        {getClubName(booking.club_id)}
                       </span>
                     </td>
                     <td className="date-cell">
-                      <span className="date-text">{booking.date}</span>
+                      <span className="date-text">{booking.booking_date}</span>
                     </td>
                     <td className="time-cell">
                       <span className="time-text">{booking.time}</span>
@@ -433,7 +374,7 @@ const DeleteBookingsPage = () => {
                       <span className="hours-count">{booking.hours} ч</span>
                     </td>
                     <td className="chatid-cell">
-                      <code className="chatid-code">{booking.chatId}</code>
+                      <code className="chatid-code">{booking.chat_id}</code>
                     </td>
                     <td className="actions-cell">
                       <button
@@ -483,7 +424,7 @@ const DeleteBookingsPage = () => {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="Удаление брони"
-        message={`Вы уверены, что хотите удалить бронь?\n${bookingToDelete?.userName}, ${getClubName(bookingToDelete?.club)}, ${bookingToDelete?.date} ${bookingToDelete?.time}`}
+        message={`Вы уверены, что хотите удалить бронь?\n${bookingToDelete?.user_name}, ${getClubName(bookingToDelete?.club_id)}, ${bookingToDelete?.booking_date} ${bookingToDelete?.time}`}
         confirmText="Удалить бронь"
         cancelText="Отмена"
       />

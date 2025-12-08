@@ -68,7 +68,7 @@ const SearchUserPage = () => {
       <div className="search-header">
         <h1>Найти пользователя</h1>
         <p className="search-subtitle">
-          Введите chat_id пользователя для получения информации
+          Введи chat_id пользователя для получения информации
         </p>
       </div>
 
@@ -125,7 +125,7 @@ const SearchUserPage = () => {
             <div className="error-icon">!</div>
             <div className="error-content">
               <h3>Ошибка поиска</h3>
-              <p>{error}</p>
+              <p>{error}. Обратись к разработчику.</p>
             </div>
           </div>
         )}
@@ -185,7 +185,7 @@ const SearchUserPage = () => {
           </div>
         )}
 
-        {!userData && !error && (
+        {/* {!userData && !error && (
           <div className="search-hint">
             <div className="hint-icon">💡</div>
             <div className="hint-content">
@@ -195,7 +195,7 @@ const SearchUserPage = () => {
               </ul>
             </div>
           </div>
-        )}
+        )} */}
       </div>
     </div>
   );
