@@ -41,11 +41,11 @@ const NonWorkingDaysPage = () => {
       
       // Преобразуем данные из API в нужный формат
       const formattedDays = data.map(day => ({
-        id: day.id || day._id,
-        club: day.club || 'all',
-        date: formatDateToDisplay(day.date),
-        reason: day.reason || '',
-        createdAt: formatDateTime(day.createdAt) || formatDateTime(new Date())
+        id: day.off_id || day._id,
+        club: day.club_id || 'all',
+        date: formatDateToDisplay(day.off_date),
+        reason: day.off_reason || '',
+        // createdAt: formatDateTime(day.createdAt) || formatDateTime(new Date())
       }));
       
       setNonWorkingDays(formattedDays);
@@ -179,11 +179,11 @@ const NonWorkingDaysPage = () => {
     try {
       // Формируем данные для отправки
       const dayOffData = {
-        club: club,
-        date: formatDateForAPI(date),
-        reason: reason.trim() || '',
+        club_id: club,
+        off_date: formatDateForAPI(date),
+        off_reason: reason.trim() || '',
         // Добавляем timestamp для создания
-        createdAt: new Date().toISOString()
+        // createdAt: new Date().toISOString()
       };
 
       // Отправляем запрос на создание нерабочего дня
@@ -204,11 +204,11 @@ const NonWorkingDaysPage = () => {
 
       // Форматируем новый день для отображения
       const formattedDay = {
-        id: newDay.id || newDay._id,
-        club: newDay.club || club,
-        date: formatDateToDisplay(newDay.date) || date,
-        reason: newDay.reason || reason.trim() || '',
-        createdAt: formatDateTime(newDay.createdAt) || formatDateTime(new Date())
+        id: newDay.off_id || newDay._id,
+        club: newDay.club_id || club,
+        date: formatDateToDisplay(newDay.off_date) || date,
+        reason: newDay.off_reason || reason.trim() || '',
+        // createdAt: formatDateTime(newDay.createdAt) || formatDateTime(new Date())
       };
 
       // Добавляем новый день в список
