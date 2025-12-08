@@ -41,10 +41,10 @@ const NonWorkingDaysPage = () => {
       
       // Преобразуем данные из API в нужный формат
       const formattedDays = data.map(day => ({
-        id: day.off_id || day._id,
-        club: day.club_id || 'all',
-        date: formatDateToDisplay(day.off_date),
-        reason: day.off_reason || '',
+        off_id: day.off_id || day._id,
+        club_id: day.club_id || 'all',
+        off_date: formatDate(day.off_date),
+        off_reason: day.off_reason || '',
         // createdAt: formatDateTime(day.createdAt) || formatDateTime(new Date())
       }));
       
@@ -54,7 +54,14 @@ const NonWorkingDaysPage = () => {
       setError(`Не удалось загрузить нерабочие дни: ${err.message}`);
       
       // Для демонстрации, если API недоступен
-      // setNonWorkingDays(getMockData());
+      // let formattedDays = getMockData().map(day => ({
+      //   off_id: day.off_id || day._id,
+      //   club_id: day.club_id || 'all',
+      //   off_date: formatDate(day.off_date),
+      //   off_reason: day.off_reason || '',
+      //   // createdAt: formatDateTime(day.createdAt) || formatDateTime(new Date())
+      // }));
+      // setNonWorkingDays(formattedDays);
     } finally {
       setFetching(false);
     }
@@ -138,8 +145,8 @@ const NonWorkingDaysPage = () => {
 
     // Проверка на дубликат
     const isDuplicate = nonWorkingDays.some(day => 
-      day.club === club && 
-      day.date === dateStr
+      day.club_id === club && 
+      day.off_date === dateStr
     );
 
     if (isDuplicate) {
@@ -173,9 +180,6 @@ const NonWorkingDaysPage = () => {
     setLoading(true);
     setError('');
     
-    // Имитация запроса на сервер
-    // await new Promise(resolve => setTimeout(resolve, 500));
-    
     try {
       // Формируем данные для отправки
       const dayOffData = {
@@ -204,10 +208,10 @@ const NonWorkingDaysPage = () => {
 
       // Форматируем новый день для отображения
       const formattedDay = {
-        id: newDay.off_id || newDay._id,
-        club: newDay.club_id || club,
-        date: formatDateToDisplay(newDay.off_date) || date,
-        reason: newDay.off_reason || reason.trim() || '',
+        off_id: newDay.off_id || newDay._id,
+        club_id: newDay.club_id || club,
+        off_date: formatDateToDisplay(newDay.off_date) || date,
+        off_reason: newDay.off_reason || reason.trim() || '',
         // createdAt: formatDateTime(newDay.createdAt) || formatDateTime(new Date())
       };
 
@@ -280,7 +284,7 @@ const NonWorkingDaysPage = () => {
 
   // Сброс формы
   const resetForm = () => {
-    setClub('all');
+    setClub('kiks1');
     setDate('');
     setReason('');
   };
@@ -294,9 +298,17 @@ const NonWorkingDaysPage = () => {
     return `${day}.${month}.${year}`;
   };
 
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() возвращает 0–11
+    const year = date.getFullYear();
+    return `${day}-${month}-${year}`;
+  }
+
   // Фильтрация только будущих дат
   const futureDays = nonWorkingDays.filter(day => {
-    const [dayStr, monthStr, yearStr] = day.date.split('.').map(Number);
+    const [dayStr, monthStr, yearStr] = day.off_date.split('-').map(Number);
     const dateObj = new Date(yearStr, monthStr - 1, dayStr);
     const today = new Date();
     today.setHours(0, 0, 0, 0);
@@ -305,7 +317,7 @@ const NonWorkingDaysPage = () => {
 
   // Группировка дней по клубу для отображения
   const groupedDays = futureDays.reduce((groups, day) => {
-    const key = day.club;
+    const key = day.club_id;
     if (!groups[key]) {
       groups[key] = [];
     }
@@ -315,11 +327,18 @@ const NonWorkingDaysPage = () => {
 
   // Моковые данные для демонстрации (если API недоступно)
   const getMockData = () => [
-    { id: 1, club: 'kiks1', date: '15.03.2026', reason: 'Техническое обслуживание', createdAt: '10.03.2024 10:30' },
-    { id: 2, club: 'kiks1', date: '01.05.2026', reason: 'Праздничный день', createdAt: '01.01.2024 00:00' },
-    { id: 3, club: 'kiks1', date: '09.05.2026', reason: 'День Победы', createdAt: '01.01.2024 00:00' },
-    { id: 4, club: 'kiks2', date: '12.06.2026', reason: 'День России', createdAt: '01.01.2024 00:00' },
-    { id: 5, club: 'kiks2', date: '31.12.2026', reason: 'Новогодние праздники', createdAt: '01.12.2024 09:15' }
+    {
+      "off_id": "66",
+      "off_date": "2025-12-31T00:00:00.000Z",
+      "club_id": "kiks1",
+      "off_reason": "отдыхаем"
+    },
+    {
+      "off_id": "2",
+      "off_date": "2025-12-31T00:00:00.000Z",
+      "club_id": "kiks2",
+      "off_reason": "отдыхаем"
+    }
   ];
 
   return (
@@ -468,11 +487,11 @@ const NonWorkingDaysPage = () => {
                 </div>
                 <div className="club-days">
                   {groupedDays[clubKey].map((day) => (
-                    <div key={day.id} className="day-item">
+                    <div key={day.off_id} className="day-item">
                       <div className="day-info">
-                        <span className="day-date">{day.date}</span>
-                        {day.reason && (
-                          <span className="day-reason">{day.reason}</span>
+                        <span className="day-date">{day.off_date}</span>
+                        {day.off_reason && (
+                          <span className="day-reason">{day.off_reason}</span>
                         )}
                       </div>
                       <button
@@ -511,7 +530,7 @@ const NonWorkingDaysPage = () => {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="Внимание"
-        message={`Удалить нерабочий день?\n${getClubName(dayToDelete?.club)}, ${dayToDelete?.date}${dayToDelete?.reason ? ` (${dayToDelete.reason})` : ''}`}
+        message={`Удалить нерабочий день?\n${getClubName(dayToDelete?.club_id)}, ${dayToDelete?.off_date}${dayToDelete?.off_reason ? ` (${dayToDelete.off_reason})` : ''}`}
         confirmText="Удалить"
         cancelText="Отмена"
       />
