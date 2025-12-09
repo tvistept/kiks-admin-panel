@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useTheme } from '../context/ThemeContext';
+import { Icon } from '../components/Icons';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/NonWorkingDaysPage.css';
@@ -216,7 +216,7 @@ const NonWorkingDaysPage = () => {
 
   // Открытие диалога удаления
   const handleDeleteClick = (id) => {
-    const day = nonWorkingDays.find(d => d.id === id);
+    const day = nonWorkingDays.find(d => d.off_id === id);
     setDayToDelete(day);
     setDialogOpen(true);
   };
@@ -230,7 +230,7 @@ const NonWorkingDaysPage = () => {
     
     try {
       // Отправляем запрос на удаление
-      const response = await fetch(`${API_BASE_URL}/delete-dayoff/${dayToDelete.id}`, {
+      const response = await fetch(`${API_BASE_URL}/delete-dayoff/${dayToDelete.off_id}`, {
         method: 'DELETE'
       });
 
@@ -240,8 +240,8 @@ const NonWorkingDaysPage = () => {
       }
 
       // Удаляем день из списка
-      setNonWorkingDays(prev => prev.filter(day => day.id !== dayToDelete.id));
-      setSuccess(`Нерабочий день удален: ${getClubName(dayToDelete.club)}, ${dayToDelete.date}`);
+      setNonWorkingDays(prev => prev.filter(day => day.off_id !== dayToDelete.off_id));
+      setSuccess(`Нерабочий день удален: ${getClubName(dayToDelete.club_id)}, ${dayToDelete.off_date}`);
       
     } catch (err) {
       console.error('Ошибка удаления нерабочего дня:', err);
@@ -474,19 +474,12 @@ const NonWorkingDaysPage = () => {
                         )}
                       </div>
                       <button
-                        onClick={() => handleDeleteClick(day.id)}
+                        onClick={() => handleDeleteClick(day.off_id)}
                         className="delete-button"
                         title="Удалить"
                         disabled={loading}
                       >
-                        <svg 
-                          viewBox="0 0 24 24" 
-                          fill="currentColor"
-                          width="16" 
-                          height="16"
-                        >
-                          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
+                        <Icon name="trash"  />
                       </button>
                     </div>
                   ))}

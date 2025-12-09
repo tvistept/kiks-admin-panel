@@ -343,7 +343,7 @@
 .delete-button:hover:not(:disabled) {
   opacity: 1;
   background-color: rgba(239, 68, 68, 0.1);
-  color: #dc2626;
+  color: #dc2626!important;
 }
 
 .delete-button:disabled {
