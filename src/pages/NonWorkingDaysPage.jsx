@@ -53,13 +53,12 @@ const NonWorkingDaysPage = () => {
       console.error('Ошибка загрузки нерабочих дней:', err);
       setError(`Не удалось загрузить нерабочие дни: ${err.message}`);
       
-      // Для демонстрации, если API недоступен
+      // // Для демонстрации, если API недоступен
       // let formattedDays = getMockData().map(day => ({
       //   off_id: day.off_id || day._id,
       //   club_id: day.club_id || 'all',
       //   off_date: formatDate(day.off_date),
       //   off_reason: day.off_reason || '',
-      //   // createdAt: formatDateTime(day.createdAt) || formatDateTime(new Date())
       // }));
       // setNonWorkingDays(formattedDays);
     } finally {
@@ -67,22 +66,80 @@ const NonWorkingDaysPage = () => {
     }
   };
 
-  // Форматирование даты из API (предположим, что API возвращает в формате YYYY-MM-DD)
-  const formatDateToDisplay = (dateString) => {
-    if (!dateString) return '';
+  // Обработка отправки формы
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const dateError = validateDate(date);
+    if (dateError) {
+      setError(dateError);
+      setSuccess('');
+      return;
+    }
+
+    if (!reason.trim()) {
+      const reason = 'Причина не может быть пустой';
+      setError(reason);
+      setSuccess('');
+      return;
+    }
+
+    setLoading(true);
+    setError('');
     
     try {
-      // Если дата уже в формате DD.MM.YYYY
-      if (dateString.includes('.')) {
-        return dateString;
+      // Формируем данные для отправки
+      const dayOffData = {
+        club_id: club,
+        off_date: formatDateForAPI(date),
+        off_reason: reason.trim() || '',
+      };
+
+      // Отправляем запрос на создание нерабочего дня
+      const response = await fetch(`${API_BASE_URL}/create-dayoff`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(dayOffData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Ошибка API: ${response.status}`);
       }
+
+      const newDay = await response.data.json();
+
+      // Форматируем новый день для отображения
+      const formattedDay = {
+        off_id: newDay.off_id || newDay._id,
+        club_id: newDay.club_id || club,
+        off_date: formatDate(newDay.off_date) || date,
+        off_reason: newDay.off_reason || reason.trim() || '',
+        // createdAt: formatDateTime(newDay.createdAt) || formatDateTime(new Date())
+      };
+
+      // Добавляем новый день в список
+      setNonWorkingDays(prev => {
+        const updatedDays = [...prev, formattedDay].sort((a, b) => {
+          const [dayA, monthA, yearA] = a.date.split('.').map(Number);
+          const [dayB, monthB, yearB] = b.date.split('.').map(Number);
+          const dateA = new Date(yearA, monthA - 1, dayA);
+          const dateB = new Date(yearB, monthB - 1, dayB);
+          return dateA - dateB;
+        });
+        return updatedDays;
+      });
+
+      resetForm();
+      setSuccess(`Нерабочий день успешно добавлен: ${getClubName(club)}, ${date}`);
       
-      // Если дата в формате YYYY-MM-DD
-      const [year, month, day] = dateString.split('-');
-      return `${day}.${month}.${year}`;
     } catch (err) {
-      console.error('Ошибка форматирования даты:', err);
-      return dateString;
+      console.error('Ошибка добавления нерабочего дня:', err);
+      setError(`Не удалось добавить нерабочий день: ${err.message}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -96,25 +153,6 @@ const NonWorkingDaysPage = () => {
     } catch (err) {
       console.error('Ошибка форматирования даты для API:', err);
       return dateString;
-    }
-  };
-
-  // Форматирование даты и времени
-  const formatDateTime = (dateString) => {
-    if (!dateString) return '';
-    
-    try {
-      const date = new Date(dateString);
-      const day = date.getDate().toString().padStart(2, '0');
-      const month = (date.getMonth() + 1).toString().padStart(2, '0');
-      const year = date.getFullYear();
-      const hours = date.getHours().toString().padStart(2, '0');
-      const minutes = date.getMinutes().toString().padStart(2, '0');
-      
-      return `${day}.${month}.${year} ${hours}:${minutes}`;
-    } catch (err) {
-      console.error('Ошибка форматирования даты и времени:', err);
-      return '';
     }
   };
 
@@ -163,78 +201,6 @@ const NonWorkingDaysPage = () => {
       case 'kiks1': return 'Марата';
       case 'kiks2': return 'Каменноостровский';
       default: return '';
-    }
-  };
-
-  // Обработка отправки формы
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    
-    const dateError = validateDate(date);
-    if (dateError) {
-      setError(dateError);
-      setSuccess('');
-      return;
-    }
-
-    setLoading(true);
-    setError('');
-    
-    try {
-      // Формируем данные для отправки
-      const dayOffData = {
-        club_id: club,
-        off_date: formatDateForAPI(date),
-        off_reason: reason.trim() || '',
-        // Добавляем timestamp для создания
-        // createdAt: new Date().toISOString()
-      };
-
-      // Отправляем запрос на создание нерабочего дня
-      const response = await fetch(`${API_BASE_URL}/create-dayoff`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(dayOffData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || `Ошибка API: ${response.status}`);
-      }
-
-      const newDay = await response.json();
-
-      // Форматируем новый день для отображения
-      const formattedDay = {
-        off_id: newDay.off_id || newDay._id,
-        club_id: newDay.club_id || club,
-        off_date: formatDateToDisplay(newDay.off_date) || date,
-        off_reason: newDay.off_reason || reason.trim() || '',
-        // createdAt: formatDateTime(newDay.createdAt) || formatDateTime(new Date())
-      };
-
-      // Добавляем новый день в список
-      setNonWorkingDays(prev => {
-        const updatedDays = [...prev, formattedDay].sort((a, b) => {
-          const [dayA, monthA, yearA] = a.date.split('.').map(Number);
-          const [dayB, monthB, yearB] = b.date.split('.').map(Number);
-          const dateA = new Date(yearA, monthA - 1, dayA);
-          const dateB = new Date(yearB, monthB - 1, dayB);
-          return dateA - dateB;
-        });
-        return updatedDays;
-      });
-
-      resetForm();
-      setSuccess(`Нерабочий день успешно добавлен: ${getClubName(club)}, ${date}`);
-      
-    } catch (err) {
-      console.error('Ошибка добавления нерабочего дня:', err);
-      setError(`Не удалось добавить нерабочий день: ${err.message}`);
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -287,15 +253,6 @@ const NonWorkingDaysPage = () => {
     setClub('kiks1');
     setDate('');
     setReason('');
-  };
-
-  // Получение сегодняшней даты в нужном формате
-  const getTodayDate = () => {
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = today.getFullYear();
-    return `${day}.${month}.${year}`;
   };
 
   const formatDate = (isoString) => {
