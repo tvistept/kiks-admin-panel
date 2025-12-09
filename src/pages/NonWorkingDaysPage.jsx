@@ -110,6 +110,15 @@ const NonWorkingDaysPage = () => {
       }
 
       const responseData = await response.json(); // Сначала получаем полный ответ
+      //  const responseData = {
+      //     "message": "Нерабочий день успешно создан",
+      //     "data": {
+      //         "off_id": "4",
+      //         "club_id": "kiks1",
+      //         "off_date": "2066-11-04T21:00:00.000Z",
+      //         "off_reason": "test"
+      //     }
+      // }
       const newDay = responseData.data; // Затем достаём нужное поле
 
       // Форматируем новый день для отображения
@@ -124,8 +133,8 @@ const NonWorkingDaysPage = () => {
       // Добавляем новый день в список
       setNonWorkingDays(prev => {
         const updatedDays = [...prev, formattedDay].sort((a, b) => {
-          const [dayA, monthA, yearA] = a.date.split('.').map(Number);
-          const [dayB, monthB, yearB] = b.date.split('.').map(Number);
+          const [dayA, monthA, yearA] = a.off_date.split('-').map(Number);
+          const [dayB, monthB, yearB] = b.off_date.split('-').map(Number);
           const dateA = new Date(yearA, monthA - 1, dayA);
           const dateB = new Date(yearB, monthB - 1, dayB);
           return dateA - dateB;
@@ -284,20 +293,32 @@ const NonWorkingDaysPage = () => {
   }, {});
 
   // Моковые данные для демонстрации (если API недоступно)
-  const getMockData = () => [
-    {
-      "off_id": "66",
-      "off_date": "2025-12-31T00:00:00.000Z",
-      "club_id": "kiks1",
-      "off_reason": "отдыхаем"
-    },
-    {
-      "off_id": "2",
-      "off_date": "2025-12-31T00:00:00.000Z",
-      "club_id": "kiks2",
-      "off_reason": "отдыхаем"
-    }
-  ];
+  // const getMockData = () => [
+  //   {
+  //       "off_id": "1",
+  //       "off_date": "2025-12-31T00:00:00.000Z",
+  //       "club_id": "kiks1",
+  //       "off_reason": "отдыхаем"
+  //   },
+  //   {
+  //       "off_id": "2",
+  //       "off_date": "2025-12-31T00:00:00.000Z",
+  //       "club_id": "kiks2",
+  //       "off_reason": "отдыхаем"
+  //   },
+  //   {
+  //       "off_id": "8",
+  //       "off_date": "2027-09-29T21:00:00.000Z",
+  //       "club_id": "kiks2",
+  //       "off_reason": "1234"
+  //   },
+  //   {
+  //       "off_id": "9",
+  //       "off_date": "2999-09-29T21:00:00.000Z",
+  //       "club_id": "kiks1",
+  //       "off_reason": "test33"
+  //   }
+  // ];
 
   return (
     <div className="non-working-container">

@@ -83,7 +83,7 @@ const AdminDashboard = ({ onLogout }) => {
           
           <div className="header-right">
             <ThemeToggle />
-            <button onClick={onLogout} className="logout-button">
+            <button onClick={onLogout} className="logout-button" title='Выйти из системы'>
               <Icon name="signOut" size="sm" className="logout-icon" />
             </button>
           </div>

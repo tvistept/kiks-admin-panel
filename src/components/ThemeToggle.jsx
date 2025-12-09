@@ -10,7 +10,8 @@ const ThemeToggle = () => {
     <button
       onClick={toggleTheme}
       className="theme-toggle"
-      aria-label={isDarkMode ? 'Переключить на светлую тему' : 'Переключить на темную тему'}
+      title= {isDarkMode ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
+      aria-label={isDarkMode ? 'Переключить на светлую тему' : 'Переключить на тёмную тему'}
     >
       <Icon 
         name={isDarkMode ? 'sun' : 'moon'} 
