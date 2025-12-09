@@ -109,9 +109,8 @@ const NonWorkingDaysPage = () => {
         throw new Error(errorData.message || `Ошибка API: ${response.status}`);
       }
 
-      const newDay = await response.json().data;
-      console.log(newDay)
-      console.log(response)
+      const responseData = await response.json(); // Сначала получаем полный ответ
+      const newDay = responseData.data; // Затем достаём нужное поле
 
       // Форматируем новый день для отображения
       const formattedDay = {
