@@ -65,17 +65,17 @@ const CloseSlotsPage = () => {
       console.error('Ошибка загрузки закрытых слотов:', err);
       setError(`Не удалось загрузить закрытые слоты: ${err.message}`);
       
-      // Для демонстрации, если API недоступен
-      let formattedSlots = getMockData().map(day => ({
-        id: day.id ,
-        time: formatTime(day.time),
-        hours: day.hours,
-        table: day.table,
-        club: day.club,
-        date: formatDate(day.date),
-        signature: day.signature,
-      }));
-      setClosedSlots(formattedSlots);
+      // // Для демонстрации, если API недоступен
+      // let formattedSlots = getMockData().map(day => ({
+      //   id: day.id ,
+      //   time: formatTime(day.time),
+      //   hours: day.hours,
+      //   table: day.table,
+      //   club: day.club,
+      //   date: formatDate(day.date),
+      //   signature: day.signature,
+      // }));
+      // setClosedSlots(formattedSlots);
     } finally {
       setFetching(false);
     }

@@ -90,18 +90,18 @@ const SearchUserPage = () => {
     return `${day}-${month}-${year}`;
   }
 
-  const getMockData = () => [
-   {
-    "id": 4178,
-    "chat_id": "93753787",
-    "firstName": "липкий плот",
-    "phone": "89995280695",
-    "user_name": "tvistept",
-    "blocked_status": null,
-    "createdAt": "2025-12-04T17:12:24.509Z",
-    "updatedAt": "2025-12-04T17:12:49.912Z"
-    }
-  ];
+  // const getMockData = () => [
+  //  {
+  //   "id": 4178,
+  //   "chat_id": "93753787",
+  //   "firstName": "липкий плот",
+  //   "phone": "89995280695",
+  //   "user_name": "tvistept",
+  //   "blocked_status": null,
+  //   "createdAt": "2025-12-04T17:12:24.509Z",
+  //   "updatedAt": "2025-12-04T17:12:49.912Z"
+  //   }
+  // ];
 
   return (
     <div className="search-container">
@@ -124,7 +124,12 @@ const SearchUserPage = () => {
                 id="chatId"
                 type="text"
                 value={chatId}
-                onChange={(e) => setChatId(e.target.value)}
+                onChange={(e) => {
+                  const inputValue = e.target.value;
+                  // Оставляем только цифры
+                  const digits = inputValue.replace(/[^\d-]|^-(?=.*-)/g, '');
+                  setChatId(digits)
+                }}
                 className="input-field"
                 placeholder="Например: 123456789"
                 disabled={loading}
@@ -166,7 +171,7 @@ const SearchUserPage = () => {
             <div className="error-icon">!</div>
             <div className="error-content">
               <h3>Ошибка поиска</h3>
-              <p>{error}. Обратись к разработчику.</p>
+              <p>{error}</p>
             </div>
           </div>
         )}

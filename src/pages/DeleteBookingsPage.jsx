@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { Icon } from '../components/Icons';
 import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/DeleteBookingsPage.css';
+const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 
 const DeleteBookingsPage = () => {
   // Состояния для поиска по клубу и дате
@@ -75,7 +77,7 @@ const DeleteBookingsPage = () => {
       }
 
       try {
-        const response = await fetch(`https://kiks-app.ru:5000/api/get-bookings-by-chat-id?chat_id=${searchChatId}`);
+        const response = await fetch(`${API_BASE_URL}/get-bookings-by-chat-id?chat_id=${searchChatId}`);
         if (!response.ok) {
           throw new Error('Ошибка загрузки броней по chat_id');
         }
@@ -102,7 +104,7 @@ const DeleteBookingsPage = () => {
       }
       
       try {
-        const response = await fetch(`https://kiks-app.ru:5000/api/get-bookings-by-date?club_id=${searchClub}&booking_date=${searchDate}`);
+        const response = await fetch(`${API_BASE_URL}/get-bookings-by-date?club_id=${searchClub}&booking_date=${searchDate}`);
         if (!response.ok) {
           throw new Error('Ошибка загрузки броней по дате');
         }
@@ -146,19 +148,29 @@ const DeleteBookingsPage = () => {
     
     setLoading(true);
     setDialogOpen(false);
-    
-    // Имитация запроса на сервер
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    // Удаляем из основного списка
-    setBookings(prev => prev.filter(b => b.id !== bookingToDelete.id));
-    
-    // Удаляем из результатов поиска
-    setSearchResults(prev => prev.filter(b => b.id !== bookingToDelete.id));
-    
-    setSuccess(`Бронь удалена: ${bookingToDelete.user_name}, ${bookingToDelete.booking_date} ${bookingToDelete.time}`);
-    setBookingToDelete(null);
-    setLoading(false);
+
+    try {
+      // Отправляем запрос на удаление
+      const response = await fetch(`${API_BASE_URL}/delete-booking/${bookingToDelete.booking_id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Ошибка API: ${response.status}`);
+      }
+      // Удаляем бронь из списка
+      setBookings(prev => prev.filter(b => b.booking_id !== bookingToDelete.booking_id));
+      // Удаляем из результатов поиска
+      setSearchResults(prev => prev.filter(b => b.booking_id !== bookingToDelete.booking_id));
+      setSuccess(`Бронь удалена: ${bookingToDelete.user_name}, ${formatDate(bookingToDelete.booking_date)} ${bookingToDelete.time ? formatTime(bookingToDelete.time) : ''}`);
+    } catch (err) {
+      console.error('Ошибка удаления нерабочего дня:', err);
+      setError(`Не удалось удалить нерабочий день: ${err.message}`);
+    } finally {
+      setBookingToDelete(null);
+      setLoading(false);
+    }
   };
 
   // Отмена удаления
@@ -286,16 +298,23 @@ const DeleteBookingsPage = () => {
                 <div className="form-row">
                   <div className="form-group full-width">
                     <label htmlFor="searchChatId" className="form-label">
-                      Chat ID пользователя *
+                      Chat ID пользователя
                     </label>
                     <input
                       id="searchChatId"
-                      type="text"
+                      type="number"
                       value={searchChatId}
                       onChange={(e) => {
-                        setSearchChatId(e.target.value);
+                        const inputValue = e.target.value;
+                        // Оставляем только цифры
+                        const digits = inputValue.replace(/[^\d-]|^-(?=.*-)/g, '');
+                        setSearchChatId(digits);
                         setError('');
                       }}
+                      // onChange={(e) => {
+                      //   setSearchChatId(e.target.value);
+                      //   setError('');
+                      // }}
                       className="chatid-input"
                       placeholder="Введите chat_id"
                       required
@@ -397,14 +416,7 @@ const DeleteBookingsPage = () => {
                         title="Удалить бронь"
                         disabled={loading}
                       >
-                        <svg 
-                          viewBox="0 0 24 24" 
-                          fill="currentColor"
-                          width="16" 
-                          height="16"
-                        >
-                          <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
+                        <Icon name="trash"  />
                       </button>
                     </td>
                   </tr>
@@ -426,8 +438,8 @@ const DeleteBookingsPage = () => {
           <p>Брони не найдены</p>
           <p className="empty-hint">
             {searchByChatId 
-              ? 'Попробуйте другой chat_id' 
-              : 'Попробуйте другую дату или выберите другой клуб'}
+              ? 'Попробуй другой chat_id' 
+              : 'Попробуй другую дату или выбери другой клуб'}
           </p>
         </div>
       )}
@@ -438,7 +450,7 @@ const DeleteBookingsPage = () => {
         onClose={handleDeleteCancel}
         onConfirm={handleDeleteConfirm}
         title="Внимание"
-        message={`Удалить бронь?\n${bookingToDelete?.user_name}, ${getClubName(bookingToDelete?.club_id)}, ${bookingToDelete?.booking_date} ${bookingToDelete?.time}`}
+        message={`Удалить бронь?\n${bookingToDelete?.user_name}, ${getClubName(bookingToDelete?.club_id)}, ${formatDate(bookingToDelete?.booking_date)} ${bookingToDelete?.time ? formatTime(bookingToDelete.time) : ''}`}
         confirmText="Удалить бронь"
         cancelText="Отмена"
       />
