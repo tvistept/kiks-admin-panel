@@ -384,11 +384,6 @@
     flex-direction: column;
   }
   
-  .add-button,
-  .clear-button {
-    width: 100%;
-  }
-  
   .day-info {
     flex-direction: column;
     align-items: flex-start;

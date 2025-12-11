@@ -329,6 +329,9 @@ const NonWorkingDaysPage = () => {
         <p className="page-subtitle">
           Добавляй даты, когда клубы будут закрыты
         </p>
+        <p className="page-subtitle">
+          Каждый нерабочий день создаёт бронь на все столы в клубе с открытия и до закрытия
+        </p>
       </div>
 
       <div className="form-section">

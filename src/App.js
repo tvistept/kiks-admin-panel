@@ -9,6 +9,7 @@ import PlaceholderPage from './pages/PlaceholderPage';
 import NonWorkingDaysPage from './pages/NonWorkingDaysPage';
 import CloseSlotsPage from './pages/CloseSlotsPage';
 import DeleteBookingsPage from './pages/DeleteBookingsPage';
+import ScrollToTop from './components/ScrollToTop';
 import './styles/global.css';
 
 function App() {
@@ -25,6 +26,7 @@ function App() {
   return (
     <ThemeProvider>
       <Router>
+        <ScrollToTop />
         <Routes>
           <Route 
             path="/login" 

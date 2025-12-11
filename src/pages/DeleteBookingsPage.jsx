@@ -237,15 +237,26 @@ const DeleteBookingsPage = () => {
 
                   <div className="form-group">
                     <label htmlFor="searchDate" className="form-label">
-                      Дата *
+                      Дата
                     </label>
                     <input
                       id="searchDate"
                       type="text"
                       value={searchDate}
                       onChange={(e) => {
-                        setSearchDate(e.target.value);
-                        setError('');
+                        const inputValue = e.target.value;
+                        let formattedValue = '';
+                        const digits = inputValue.replace(/\D/g, '');
+                        for (let i = 0; i < digits.length; i++) {
+                          if (i === 2 || i === 4) {
+                            formattedValue += '.';
+                          }
+                          formattedValue += digits[i];
+                        }
+                        if (formattedValue.length <= 10) {
+                          setSearchDate(formattedValue);
+                          setError('');
+                        }
                       }}
                       className="date-input"
                       placeholder="ДД.ММ.ГГГГ"

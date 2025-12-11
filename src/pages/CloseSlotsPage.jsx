@@ -1,24 +1,28 @@
-import React, { useState } from 'react';
-import { useTheme } from '../context/ThemeContext';
+import React, { useState, useEffect } from 'react';
+// import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/CloseSlotsPage.css';
+import { Icon } from '../components/Icons';
+const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 
 const CloseSlotsPage = () => {
-  const { isDarkMode } = useTheme();
+  // const { isDarkMode } = useTheme();
   const [club, setClub] = useState('kiks1');
   const [table, setTable] = useState('3');
   const [date, setDate] = useState('');
-  const [time, setTime] = useState('');
+  const [time, setTime] = useState('12:00');
   const [hours, setHours] = useState('1');
   const [signature, setSignature] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [fetching, setFetching] = useState(true);
   
   // Состояние для диалога подтверждения удаления
   const [dialogOpen, setDialogOpen] = useState(false);
   const [slotToDelete, setSlotToDelete] = useState(null);
+  const [closedSlots, setClosedSlots] = useState([]);
   
   // Список доступных столов для каждого клуба
   const availableTables = {
@@ -26,50 +30,56 @@ const CloseSlotsPage = () => {
     kiks2: ['3', '4', '6', '7', '8']
   };
 
-  // Моковые данные для демонстрации
-  const [closedSlots, setClosedSlots] = useState([
-    { 
-      id: 1, 
-      club: 'kiks1', 
-      table: '4', 
-      date: '20.03.2026', 
-      time: '14:00', 
-      hours: '2', 
-      signature: 'Техническое обслуживание',
-      created: '15.03.2024 10:30'
-    },
-    { 
-      id: 2, 
-      club: 'kiks2', 
-      table: '6', 
-      date: '22.03.2026', 
-      time: '18:00', 
-      hours: '3', 
-      signature: 'Частное мероприятие',
-      created: '18.03.2024 14:20'
-    },
-    { 
-      id: 3, 
-      club: 'kiks1', 
-      table: '5', 
-      date: '25.03.2026', 
-      time: '20:00', 
-      hours: '1', 
-      signature: '',
-      created: '20.03.2024 09:15'
-    },
-    { 
-      id: 4, 
-      club: 'kiks1', 
-      table: '5', 
-      date: '25.04.2026', 
-      time: '20:00', 
-      hours: '1', 
-      signature: '',
-      created: '20.03.2026 09:15'
+  // Загрузка данных при открытии страницы
+  useEffect(() => {
+    fetchClosedSlots(); 
+  },[]);
+
+  // Функция для загрузки закрытых слотов с API
+  const fetchClosedSlots = async () => {
+    try {
+      setFetching(true);
+      setError('');
+      
+      const response = await fetch(`${API_BASE_URL}/get-closed-slots`);
+      
+      if (!response.ok) {
+        throw new Error(`Ошибка API: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      
+      // Преобразуем данные из API в нужный формат
+      const formattedSlots = data.map(day => ({
+        id: day.id ,
+        time: formatTime(day.time),
+        hours: day.hours,
+        table: day.table,
+        club: day.club,
+        date: formatDate(day.date),
+        signature: day.signature,
+      }));
+      
+      setClosedSlots(formattedSlots);
+    } catch (err) {
+      console.error('Ошибка загрузки закрытых слотов:', err);
+      setError(`Не удалось загрузить закрытые слоты: ${err.message}`);
+      
+      // Для демонстрации, если API недоступен
+      let formattedSlots = getMockData().map(day => ({
+        id: day.id ,
+        time: formatTime(day.time),
+        hours: day.hours,
+        table: day.table,
+        club: day.club,
+        date: formatDate(day.date),
+        signature: day.signature,
+      }));
+      setClosedSlots(formattedSlots);
+    } finally {
+      setFetching(false);
     }
-    
-  ]);
+  };
 
   // Обработка изменения клуба
   const handleClubChange = (e) => {
@@ -88,6 +98,11 @@ const CloseSlotsPage = () => {
     const dateRegex = /^\d{2}\.\d{2}\.\d{4}$/;
     if (!dateRegex.test(date)) {
       return 'Дата должна быть в формате ДД.ММ.ГГГГ';
+    }
+
+    const dateError = validateDate(date);
+    if (dateError) {
+      return dateError;
     }
 
     if (!time.trim()) {
@@ -141,6 +156,34 @@ const CloseSlotsPage = () => {
     return `${formattedHours}:${formattedMinutes}`;
   };
 
+  const validateDate = (dateStr) => {
+    const regex = /^\d{2}\.\d{2}\.\d{4}$/;
+    if (!regex.test(dateStr)) {
+      return 'Дата должна быть в формате ДД.ММ.ГГГГ';
+    }
+
+    const [day, month, year] = dateStr.split('.').map(Number);
+    const dateObj = new Date(year, month - 1, day);
+    
+    if (
+      dateObj.getFullYear() !== year ||
+      dateObj.getMonth() !== month - 1 ||
+      dateObj.getDate() !== day
+    ) {
+      return 'Некорректная дата';
+    }
+    
+
+    // Проверка что дата не в прошлом
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    if (dateObj < today) {
+      return 'Нельзя добавлять прошедшие даты';
+    }
+
+    return '';
+  };
+
   // Обработка отправки формы
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -155,52 +198,120 @@ const CloseSlotsPage = () => {
     setLoading(true);
     setError('');
     
-    // Имитация запроса на сервер
-    await new Promise(resolve => setTimeout(resolve, 600));
-    
-    const endTime = calculateEndTime(time, hours);
-    const now = new Date();
-    const createdDate = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-    
-    const newSlot = {
-      id: Date.now(),
-      club,
-      table,
-      date,
-      time,
-      hours,
-      endTime,
-      signature: signature.trim(),
-      created: createdDate
-    };
+     try {
+      // Формируем данные для отправки
+      const closedSlotData = {
+        club_id: club,
+        booking_date: formatDateForAPI(date),
+        time: time,
+        hours: hours,
+        table: table,
+        signature: signature.trim(),
+      };
 
-    // Сортировка по дате и времени
-    const updatedSlots = [...closedSlots, newSlot].sort((a, b) => {
-      const [dayA, monthA, yearA] = a.date.split('.').map(Number);
-      const [dayB, monthB, yearB] = b.date.split('.').map(Number);
-      const dateA = new Date(yearA, monthA - 1, dayA);
-      const dateB = new Date(yearB, monthB - 1, dayB);
-      
-      if (dateA.getTime() !== dateB.getTime()) {
-        return dateA - dateB;
+      // Отправляем запрос на создание нерабочего дня
+      const response = await fetch(`${API_BASE_URL}/create-closed-slot`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(closedSlotData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Ошибка API: ${response.status}`);
       }
-      
-      // Если дата одинаковая, сортируем по времени
-      const [hoursA, minutesA] = a.time.split(':').map(Number);
-      const [hoursB, minutesB] = b.time.split(':').map(Number);
-      return (hoursA * 60 + minutesA) - (hoursB * 60 + minutesB);
-    });
 
-    setClosedSlots(updatedSlots);
-    resetForm();
-    setSuccess(`Слот успешно закрыт: ${club}, стол ${table}, ${date} ${time}-${endTime}`);
-    setLoading(false);
+      const responseData = await response.json(); // Сначала получаем полный ответ
+      const newClosedSlot = responseData.data; // Затем достаём нужное поле
+
+      // Форматируем новый день для отображения
+      const formattedClosedSlot = {
+        id: newClosedSlot.booking_id,
+        time: formatTime(newClosedSlot.time),
+        hours: newClosedSlot.hours,
+        table: newClosedSlot.table,
+        club: newClosedSlot.club_id,
+        date: formatDate(newClosedSlot.booking_date),
+        signature: newClosedSlot.user_name,
+      };
+
+      const endTime = calculateEndTime(time, hours);
+      // const now = new Date();
+      // const createdDate = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+      // Сортировка по дате и времени
+      const updatedSlots = [...closedSlots, formattedClosedSlot].sort((a, b) => {
+        const [dayA, monthA, yearA] = a.date.split('.').map(Number);
+        const [dayB, monthB, yearB] = b.date.split('.').map(Number);
+        const dateA = new Date(yearA, monthA - 1, dayA);
+        const dateB = new Date(yearB, monthB - 1, dayB);
+        
+        if (dateA.getTime() !== dateB.getTime()) {
+          return dateA - dateB;
+        }
+        
+        // Если дата одинаковая, сортируем по времени
+        const [hoursA, minutesA] = a.time.split(':').map(Number);
+        const [hoursB, minutesB] = b.time.split(':').map(Number);
+        return (hoursA * 60 + minutesA) - (hoursB * 60 + minutesB);
+      });
+
+      setClosedSlots(updatedSlots);
+      resetForm();
+      setSuccess(`Слот успешно закрыт: ${club}, стол ${table}, ${date} ${time}-${endTime}`);
+    } catch (err) {
+      console.error('Ошибка добавления закрытого слота:', err);
+      setError(`Не удалось добавить закрытый слот: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+    // Имитация запроса на сервер
+    // await new Promise(resolve => setTimeout(resolve, 600));
+    
+    // const endTime = calculateEndTime(time, hours);
+    // const now = new Date();
+    // const createdDate = `${now.getDate().toString().padStart(2, '0')}.${(now.getMonth() + 1).toString().padStart(2, '0')}.${now.getFullYear()} ${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    
+    // const newSlot = {
+    //   id: Date.now(),
+    //   club,
+    //   table,
+    //   date,
+    //   time,
+    //   hours,
+    //   endTime,
+    //   signature: signature.trim(),
+    //   created: createdDate
+    // };
+
+    // // Сортировка по дате и времени
+    // const updatedSlots = [...closedSlots, newSlot].sort((a, b) => {
+    //   const [dayA, monthA, yearA] = a.date.split('.').map(Number);
+    //   const [dayB, monthB, yearB] = b.date.split('.').map(Number);
+    //   const dateA = new Date(yearA, monthA - 1, dayA);
+    //   const dateB = new Date(yearB, monthB - 1, dayB);
+      
+    //   if (dateA.getTime() !== dateB.getTime()) {
+    //     return dateA - dateB;
+    //   }
+      
+    //   // Если дата одинаковая, сортируем по времени
+    //   const [hoursA, minutesA] = a.time.split(':').map(Number);
+    //   const [hoursB, minutesB] = b.time.split(':').map(Number);
+    //   return (hoursA * 60 + minutesA) - (hoursB * 60 + minutesB);
+    // });
+
+    // setClosedSlots(updatedSlots);
+    // resetForm();
+    // setSuccess(`Слот успешно закрыт: ${club}, стол ${table}, ${date} ${time}-${endTime}`);
+    // setLoading(false);
   };
 
   // Сброс формы
   const resetForm = () => {
     setDate('');
-    setTime('');
+    setTime('12:00');
     setHours('1');
     setSignature('');
   };
@@ -217,14 +328,29 @@ const CloseSlotsPage = () => {
     
     setLoading(true);
     setDialogOpen(false);
-    
-    // Имитация запроса на сервер
-    await new Promise(resolve => setTimeout(resolve, 500));
-    
-    setClosedSlots(prev => prev.filter(slot => slot.id !== slotToDelete.id));
-    setSuccess(`Закрытый слот удален: ${slotToDelete.club}, стол ${slotToDelete.table}, ${slotToDelete.date} ${slotToDelete.time}`);
-    setSlotToDelete(null);
-    setLoading(false);
+
+    try {
+      // Отправляем запрос на удаление
+      const response = await fetch(`${API_BASE_URL}/delete-closed-slot/${slotToDelete.id}`, {
+        method: 'DELETE'
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || `Ошибка API: ${response.status}`);
+      }
+
+      // Удаляем день из списка
+      setClosedSlots(prev => prev.filter(slot => slot.id !== slotToDelete.id));
+      setSuccess(`Закрытый слот удален: ${slotToDelete.club}, стол ${slotToDelete.table}, ${slotToDelete.date} ${slotToDelete.time}`);
+      
+    } catch (err) {
+      console.error('Ошибка удаления закрытого слота:', err);
+      setError(`Не удалось удалить закрытый слот: ${err.message}`);
+    } finally {
+      setSlotToDelete(null);
+      setLoading(false);
+    }
   };
 
   // Отмена удаления
@@ -233,14 +359,27 @@ const CloseSlotsPage = () => {
     setSlotToDelete(null);
   };
 
-  // Получение сегодняшней даты в нужном формате
-  const getTodayDate = () => {
-    const today = new Date();
-    const day = String(today.getDate()).padStart(2, '0');
-    const month = String(today.getMonth() + 1).padStart(2, '0');
-    const year = today.getFullYear();
+  const formatDate = (isoString) => {
+    const date = new Date(isoString);
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // getMonth() возвращает 0–11
+    const year = date.getFullYear();
     return `${day}.${month}.${year}`;
-  };
+  }
+
+  const formatTime = (time) => {
+    const trimmed = time.substring(0, 5);
+    return trimmed;
+  }
+
+  // Получение сегодняшней даты в нужном формате
+  // const getTodayDate = () => {
+  //   const today = new Date();
+  //   const day = String(today.getDate()).padStart(2, '0');
+  //   const month = String(today.getMonth() + 1).padStart(2, '0');
+  //   const year = today.getFullYear();
+  //   return `${day}.${month}.${year}`;
+  // };
 
   // Фильтрация только будущих слотов
   const futureSlots = closedSlots.filter(slot => {
@@ -256,6 +395,248 @@ const CloseSlotsPage = () => {
     const endTime = calculateEndTime(slot.time, slot.hours);
     return `${slot.time} - ${endTime} (${slot.hours} ч)`;
   };
+
+  // Форматирование даты для API (DD.MM.YYYY → YYYY-MM-DD)
+  const formatDateForAPI = (dateString) => {
+    if (!dateString) return '';
+    
+    try {
+      const [day, month, year] = dateString.split('.');
+      return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+    } catch (err) {
+      console.error('Ошибка форматирования даты для API:', err);
+      return dateString;
+    }
+  };
+
+  // Моковые данные для демонстрации (если API недоступно)
+  const getMockData = () => [
+  {
+    "id": "2408",
+    "signature": "live_queue",
+    "date": "2025-12-13T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 14,
+    "table": 5,
+    "club": "kiks1"
+  },
+  {
+    "id": "2311",
+    "signature": "KIVACH",
+    "date": "2025-12-13T00:00:00.000Z",
+    "time": "18:00:00",
+    "hours": 5,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2409",
+    "signature": "live_queue",
+    "date": "2025-12-13T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 14,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2406",
+    "signature": "live_queue",
+    "date": "2025-12-13T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 14,
+    "table": 3,
+    "club": "kiks1"
+  },
+  {
+    "id": "2407",
+    "signature": "live_queue",
+    "date": "2025-12-13T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 14,
+    "table": 4,
+    "club": "kiks1"
+  },
+  {
+    "id": "2315",
+    "signature": "KIVACH",
+    "date": "2025-12-20T00:00:00.000Z",
+    "time": "19:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2756",
+    "signature": "HoReCa",
+    "date": "2025-12-22T00:00:00.000Z",
+    "time": "18:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2753",
+    "signature": "HoReCa",
+    "date": "2025-12-22T00:00:00.000Z",
+    "time": "18:00:00",
+    "hours": 4,
+    "table": 3,
+    "club": "kiks1"
+  },
+  {
+    "id": "2754",
+    "signature": "HoReCa",
+    "date": "2025-12-22T00:00:00.000Z",
+    "time": "18:00:00",
+    "hours": 4,
+    "table": 4,
+    "club": "kiks1"
+  },
+  {
+    "id": "2755",
+    "signature": "HoReCa",
+    "date": "2025-12-22T00:00:00.000Z",
+    "time": "18:00:00",
+    "hours": 4,
+    "table": 5,
+    "club": "kiks1"
+  },
+  {
+    "id": "2316",
+    "signature": "KIVACH",
+    "date": "2025-12-27T00:00:00.000Z",
+    "time": "19:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2428",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 4,
+    "club": "kiks2"
+  },
+  {
+    "id": "2430",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 7,
+    "club": "kiks2"
+  },
+  {
+    "id": "2431",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 8,
+    "club": "kiks2"
+  },
+  {
+    "id": "2423",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 3,
+    "club": "kiks1"
+  },
+  {
+    "id": "2425",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 5,
+    "club": "kiks1"
+  },
+  {
+    "id": "2424",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 4,
+    "club": "kiks1"
+  },
+  {
+    "id": "2426",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2427",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 3,
+    "club": "kiks2"
+  },
+  {
+    "id": "2429",
+    "signature": "day_off",
+    "date": "2026-01-01T00:00:00.000Z",
+    "time": "12:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks2"
+  },
+  {
+    "id": "2317",
+    "signature": "KIVACH",
+    "date": "2026-01-03T00:00:00.000Z",
+    "time": "19:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2318",
+    "signature": "KIVACH",
+    "date": "2026-01-10T00:00:00.000Z",
+    "time": "19:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2319",
+    "signature": "KIVACH",
+    "date": "2026-01-17T00:00:00.000Z",
+    "time": "19:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2320",
+    "signature": "KIVACH",
+    "date": "2026-01-24T00:00:00.000Z",
+    "time": "19:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  },
+  {
+    "id": "2321",
+    "signature": "KIVACH",
+    "date": "2026-01-31T00:00:00.000Z",
+    "time": "19:00:00",
+    "hours": 4,
+    "table": 6,
+    "club": "kiks1"
+  }
+]
 
   return (
     <div className="close-slots-container">
@@ -275,9 +656,9 @@ const CloseSlotsPage = () => {
         <div className="form-card">
           <form onSubmit={handleSubmit} className="close-slots-form">
             <div className="form-grid">
-              <div className="form-group">
+              <div className="form-group pr-club full-width">
                 <label htmlFor="club" className="form-label">
-                  Клуб *
+                  Клуб
                 </label>
                 <select
                   id="club"
@@ -291,9 +672,9 @@ const CloseSlotsPage = () => {
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className="form-group pr-table">
                 <label htmlFor="table" className="form-label">
-                  Стол *
+                  Стол
                 </label>
                 <select
                   id="table"
@@ -304,24 +685,39 @@ const CloseSlotsPage = () => {
                 >
                   {availableTables[club].map(tableNum => (
                     <option key={tableNum} value={tableNum}>
-                      Стол {tableNum}
+                      Стол {tableNum} {(tableNum === '7') ? '(WOOD ROOM)' : (tableNum === '8') ? '(DARK ROOM)' : ''}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="form-group">
+              <div className="form-group pr-datete">
                 <label htmlFor="date" className="form-label">
-                  Дата *
+                  Дата
                 </label>
                 <input
                   id="date"
                   type="text"
                   value={date}
                   onChange={(e) => {
-                    setDate(e.target.value);
-                    setError('');
+                    const inputValue = e.target.value;
+                    let formattedValue = '';
+                    const digits = inputValue.replace(/\D/g, '');
+                    for (let i = 0; i < digits.length; i++) {
+                      if (i === 2 || i === 4) {
+                        formattedValue += '.';
+                      }
+                      formattedValue += digits[i];
+                    }
+                    if (formattedValue.length <= 10) {
+                      setDate(formattedValue);
+                      setError('');
+                    }
                   }}
+                  // onChange={(e) => {
+                  //   setDate(e.target.value);
+                  //   setError('');
+                  // }}
                   className="date-input"
                   placeholder="ДД.ММ.ГГГГ"
                   maxLength="10"
@@ -329,11 +725,24 @@ const CloseSlotsPage = () => {
                 />
               </div>
 
-              <div className="form-group">
+              <div className="form-group pr-time">
                 <label htmlFor="time" className="form-label">
-                  Время начала *
+                  Время начала
                 </label>
-                <input
+                <select
+                  id="hours"
+                  value={time}
+                  onChange={(e) => setTime(e.target.value)}
+                  className="hours-select"
+                  required
+                >
+                  {['12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '00'].map(h => (
+                    <option key={h} value={h}>
+                      {h}:00
+                    </option>
+                  ))}
+                </select>
+                {/* <input
                   id="time"
                   type="text"
                   value={time}
@@ -345,12 +754,12 @@ const CloseSlotsPage = () => {
                   placeholder="ЧЧ:ММ"
                   maxLength="5"
                   required
-                />
+                /> */}
               </div>
 
-              <div className="form-group">
+              <div className="form-group pr-hours">
                 <label htmlFor="hours" className="form-label">
-                  Часы *
+                  Часы
                 </label>
                 <select
                   id="hours"
@@ -361,15 +770,15 @@ const CloseSlotsPage = () => {
                 >
                   {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(h => (
                     <option key={h} value={h.toString()}>
-                      {h} час{h !== 1 ? 'а' : ''}
+                      {h} час{(h === 1) ? '' : (h <= 4) ? 'а' : 'ов'}
                     </option>
                   ))}
                 </select>
               </div>
 
-              <div className="form-group full-width">
+              <div className="form-group pr-signature full-width">
                 <label htmlFor="signature" className="form-label">
-                  Причина закрытия *
+                  Причина закрытия
                 </label>
                 <input
                   id="signature"
@@ -437,6 +846,11 @@ const CloseSlotsPage = () => {
                   <div className="slot-header">
                     <span className="slot-club">{slot.club === 'kiks1' ? 'ул. Марата' : 'Каменноостровский пр.'}</span>
                     <span className="slot-table">Стол {slot.table}</span>
+                    {slot.signature && (
+                      <div className="slot-signature">
+                        {slot.signature}
+                      </div>
+                    )}
                   </div>
                   
                   <div className="slot-details">
@@ -444,12 +858,6 @@ const CloseSlotsPage = () => {
                       <span className="slot-date">{slot.date}</span>
                       <span className="slot-time">{formatTimeDisplay(slot)}</span>
                     </div>
-                    
-                    {slot.signature && (
-                      <div className="slot-signature">
-                        {slot.signature}
-                      </div>
-                    )}
                     
                   </div>
                 </div>
@@ -460,14 +868,7 @@ const CloseSlotsPage = () => {
                   title="Открыть слот"
                   disabled={loading}
                 >
-                  <svg 
-                    viewBox="0 0 24 24" 
-                    fill="currentColor"
-                    width="18" 
-                    height="18"
-                  >
-                    <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                  </svg>
+                  <Icon name="trash"  />
                 </button>
               </div>
             ))}
