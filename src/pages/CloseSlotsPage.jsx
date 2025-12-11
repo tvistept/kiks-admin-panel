@@ -206,7 +206,7 @@ const CloseSlotsPage = () => {
         time: time,
         hours: hours,
         table: table,
-        signature: signature.trim(),
+        user_name: signature.trim(),
       };
 
       // Отправляем запрос на создание нерабочего дня
