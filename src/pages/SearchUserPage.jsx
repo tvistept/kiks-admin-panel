@@ -122,7 +122,7 @@ const SearchUserPage = () => {
             <div className="input-with-button">
               <input
                 id="chatId"
-                type="text"
+                type="number"
                 value={chatId}
                 onChange={(e) => {
                   const inputValue = e.target.value;

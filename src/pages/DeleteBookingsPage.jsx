@@ -311,10 +311,6 @@ const DeleteBookingsPage = () => {
                         setSearchChatId(digits);
                         setError('');
                       }}
-                      // onChange={(e) => {
-                      //   setSearchChatId(e.target.value);
-                      //   setError('');
-                      // }}
                       className="chatid-input"
                       placeholder="Введите chat_id"
                       required

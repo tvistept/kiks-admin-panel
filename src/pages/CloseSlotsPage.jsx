@@ -730,14 +730,14 @@ const CloseSlotsPage = () => {
                   Время начала
                 </label>
                 <select
-                  id="hours"
+                  id="time"
                   value={time}
                   onChange={(e) => setTime(e.target.value)}
                   className="hours-select"
                   required
                 >
                   {['12', '13', '14', '15', '16', '17', '18', '19', '20', '21', '22', '23', '00'].map(h => (
-                    <option key={h} value={h}>
+                    <option key={`${h}:00`} value={`${h}:00`}>
                       {h}:00
                     </option>
                   ))}
