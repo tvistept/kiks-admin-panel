@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../components/Icons';
 import { useTheme } from '../context/ThemeContext';
+import { useSearch } from '../context/SearchContext';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/DeleteBookingsPage.css';
@@ -9,6 +10,8 @@ import '../styles/DeleteBookingsPage.css';
 const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 
 const DeleteBookingsPage = () => {
+  const { saveBookingsSearch, bookingsSearchState } = useSearch();
+
   // Состояния для поиска по клубу и дате
   const [searchClub, setSearchClub] = useState('all');
   const [searchDate, setSearchDate] = useState('');
@@ -30,10 +33,43 @@ const DeleteBookingsPage = () => {
   const navigate = useNavigate();
 
   const handleGoToSearchUser = (chatId) => {
-    // Переходим на страницу поиска пользователя с chatId в state
+    // Сохраняем текущее состояние поиска перед переходом
+    const currentSearchState = {
+      searchType: searchByChatId ? 'chatId' : 'date',
+      searchParams: {
+        searchByChatId,
+        searchClub,
+        searchDate,
+        searchChatId
+      },
+      searchResults
+    };
+    
+    // Переходим на страницу поиска пользователя
     navigate('/admin/search', { 
-      state: { chatId: chatId }
+      state: { 
+        chatId,
+        returnToBookings: true,
+        bookingsSearchState: currentSearchState
+      }
     });
+  };
+
+  // Функция для восстановления поиска из сохраненного состояния
+  const restoreSearchFromState = () => {
+    if (bookingsSearchState.searchType && bookingsSearchState.searchParams) {
+      const { searchType, searchParams, searchResults: savedResults } = bookingsSearchState;
+      
+      setSearchByChatId(searchParams.searchByChatId);
+      setSearchClub(searchParams.searchClub || 'all');
+      setSearchDate(searchParams.searchDate || '');
+      setSearchChatId(searchParams.searchChatId || '');
+      
+      if (savedResults && savedResults.length > 0) {
+        setSearchResults(savedResults);
+        setSuccess(`Найдено броней: ${savedResults.length} (восстановлено)`);
+      }
+    }
   };
 
   // Валидация даты
@@ -78,6 +114,9 @@ const DeleteBookingsPage = () => {
     setError('');
     setSuccess('');
     
+    let searchParams = {};
+    let results = [];
+
     if (searchByChatId) {
       const chatIdError = validateChatId(searchChatId);
       if (chatIdError) {
@@ -91,7 +130,7 @@ const DeleteBookingsPage = () => {
         if (!response.ok) {
           throw new Error('Ошибка загрузки броней по chat_id');
         }
-        const results = await response.json();
+        results = await response.json();
         setSearchResults(results);
 
         if (results.length === 0) {
@@ -102,8 +141,6 @@ const DeleteBookingsPage = () => {
       } catch (err) {
         setError(err.message);
         console.error('Ошибка при загрузке пользователя:', err);
-      } finally {
-        setLoading(false);
       }
     } else {
       const dateError = validateDate(searchDate);
@@ -118,7 +155,7 @@ const DeleteBookingsPage = () => {
         if (!response.ok) {
           throw new Error('Ошибка загрузки броней по дате');
         }
-        const results = await response.json();
+        results = await response.json();
         setSearchResults(results);
 
         if (results.length === 0) {
@@ -130,9 +167,21 @@ const DeleteBookingsPage = () => {
       } catch (err) {
         setError(err.message);
         console.error('Ошибка при загрузке пользователя:', err);
-      } finally {
-        setLoading(false);
       }
+    }
+    
+    // СОХРАНЯЕМ состояние поиска
+    if (results.length > 0) {
+      saveBookingsSearch(
+        searchByChatId ? 'chatId' : 'date',
+        {
+          searchByChatId,
+          searchClub,
+          searchDate,
+          searchChatId
+        },
+        results
+      );
     }
     
     setLoading(false);
@@ -207,9 +256,31 @@ const DeleteBookingsPage = () => {
     return trimmed;
   }
 
+  // Проверяем при монтировании, есть ли сохраненное состояние
+  React.useEffect(() => {
+    if (bookingsSearchState.searchType && bookingsSearchState.searchResults.length > 0) {
+      // Предлагаем восстановить поиск
+      if (window.confirm('Восстановить последний поиск броней?')) {
+        restoreSearchFromState();
+      }
+    }
+  }, []);
+
   return (
     <div className="delete-bookings-container">
       <BackButton />
+
+      {/* Добавляем кнопку восстановления поиска */}
+      {bookingsSearchState.searchType && (
+        <div className="restore-search-banner">
+          <button 
+            onClick={restoreSearchFromState}
+            className="restore-search-button"
+          >
+            ↶ Восстановить последний поиск
+          </button>
+        </div>
+      )}
       
       <div className="delete-bookings-header">
         <h1>Удаление броней</h1>

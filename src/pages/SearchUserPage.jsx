@@ -1,5 +1,5 @@
 import React, { useState,  useEffect} from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate  } from 'react-router-dom';
 // import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/BackButton';
 import '../styles/SearchUserPage.css';
@@ -8,24 +8,52 @@ const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 const SearchUserPage = () => {
 //   const { isDarkMode } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
+
   const [chatId, setChatId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [userData, setUserData] = useState(null);
   const [banLoading, setBanLoading] = useState(false);
 
+  // Флаг для возврата
+  const [hasReturnPath, setHasReturnPath] = useState(false);
+
+
+
   useEffect(() => {
-    if (location.state && location.state.chatId) {
-      setChatId(location.state.chatId);
+    if (location.state) {
+      const { chatId: navChatId, returnToBookings, bookingsSearchState } = location.state;
       
-      // Автоматически запускаем поиск, если пришел chatId
-      if (location.state.chatId.trim()) {
-        handleSearchFromNavigation(location.state.chatId);
+      if (navChatId) {
+        setChatId(navChatId);
+        
+        // Автоматически запускаем поиск
+        if (navChatId.trim()) {
+          handleSearchFromNavigation(navChatId);
+        }
+      }
+      
+      // Устанавливаем флаг для кнопки возврата
+      if (returnToBookings && bookingsSearchState) {
+        setHasReturnPath(true);
       }
     }
   }, [location.state]);
 
-   const handleSearchFromNavigation = async (chatIdFromNav) => {
+  // Функция для возврата к результатам поиска броней
+  const handleReturnToBookings = () => {
+    if (location.state && location.state.bookingsSearchState) {
+      navigate('/admin/delete-bookings', {
+        state: location.state.bookingsSearchState
+      });
+    } else {
+      navigate('/admin/delete-bookings');
+    }
+  };
+
+  // Новая функция для автоматического поиска при переходе
+  const handleSearchFromNavigation = async (chatIdFromNav) => {
     if (!chatIdFromNav.trim()) return;
 
     setLoading(true);
@@ -141,7 +169,20 @@ const SearchUserPage = () => {
 
   return (
     <div className="search-container">
-        <BackButton />
+      {/* <BackButton /> */}
+      <div className="search-header-actions">
+        {hasReturnPath ? (
+          <button 
+            onClick={handleReturnToBookings}
+            className="return-to-bookings-button"
+            title="Вернуться к результатам поиска броней"
+          >
+            ← К результатам броней
+          </button>
+        ) : (
+          <BackButton />
+        )}
+      </div>
       <div className="search-header">
         <h1>Найти пользователя</h1>
         <p className="search-subtitle">
