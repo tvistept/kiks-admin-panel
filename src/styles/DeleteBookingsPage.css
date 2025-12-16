@@ -472,6 +472,18 @@
   opacity: 0.5;
 }
 
+.clickable-chatid {
+  cursor: pointer;
+  color: #007bff;
+  text-decoration: underline;
+  transition: color 0.2s ease;
+}
+
+.clickable-chatid:hover {
+  color: #0056b3;
+  text-decoration: none;
+}
+
 /* Адаптивность */
 @media (max-width: 1024px) {
   .bookings-table-container {

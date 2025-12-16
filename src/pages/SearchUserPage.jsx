@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState,  useEffect} from 'react';
+import { useLocation } from 'react-router-dom';
 // import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/BackButton';
 import '../styles/SearchUserPage.css';
@@ -6,12 +7,47 @@ const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 
 const SearchUserPage = () => {
 //   const { isDarkMode } = useTheme();
+  const location = useLocation();
   const [chatId, setChatId] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const [userData, setUserData] = useState(null);
   const [banLoading, setBanLoading] = useState(false);
 
+  useEffect(() => {
+    if (location.state && location.state.chatId) {
+      setChatId(location.state.chatId);
+      
+      // Автоматически запускаем поиск, если пришел chatId
+      if (location.state.chatId.trim()) {
+        handleSearchFromNavigation(location.state.chatId);
+      }
+    }
+  }, [location.state]);
+
+   const handleSearchFromNavigation = async (chatIdFromNav) => {
+    if (!chatIdFromNav.trim()) return;
+
+    setLoading(true);
+    setError('');
+    setUserData(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/get-user?chat_id=${chatIdFromNav}`);
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки пользователя');
+      }
+      const data = await response.json();
+      const user = Array.isArray(data) ? data[0] : data;
+      setUserData(user);
+    } catch (err) {
+      setError(err.message);
+      console.error('Ошибка при загрузке пользователя:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+  
   const handleSearch = async (e) => {
     e.preventDefault();
     

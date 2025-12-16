@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Icon } from '../components/Icons';
 import { useTheme } from '../context/ThemeContext';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/DeleteBookingsPage.css';
+
 const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 
 const DeleteBookingsPage = () => {
@@ -25,6 +27,14 @@ const DeleteBookingsPage = () => {
 
   const [bookings, setBookings] = useState([]);
   const [searchResults, setSearchResults] = useState([]);
+  const navigate = useNavigate();
+
+  const handleGoToSearchUser = (chatId) => {
+    // Переходим на страницу поиска пользователя с chatId в state
+    navigate('/admin/search', { 
+      state: { chatId: chatId }
+    });
+  };
 
   // Валидация даты
   const validateDate = (dateStr) => {
@@ -403,7 +413,13 @@ const DeleteBookingsPage = () => {
                       <span className="hours-count">{booking.hours} ч</span>
                     </td>
                     <td className="chatid-cell">
-                      <code className="chatid-code">{booking.chat_id}</code>
+                      <code 
+                        className="chatid-code clickable-chatid"
+                        onClick={() => handleGoToSearchUser(booking.chat_id)}
+                        title="Найти пользователя"
+                      >
+                        {booking.chat_id}
+                      </code>
                     </td>
                     <td className="actions-cell">
                       <button
