@@ -1,6 +1,6 @@
 import React, { useState,  useEffect} from 'react';
 import { useLocation, useNavigate  } from 'react-router-dom';
-// import { useTheme } from '../context/ThemeContext';
+import { Icon } from '../components/Icons';
 import BackButton from '../components/BackButton';
 import '../styles/SearchUserPage.css';
 const API_BASE_URL = 'https://kiks-app.ru:5000/api';
@@ -172,12 +172,13 @@ const SearchUserPage = () => {
       {/* <BackButton /> */}
       <div className="search-header-actions">
         {hasReturnPath ? (
-          <button 
+           <button 
             onClick={handleReturnToBookings}
-            className="return-to-bookings-button"
-            title="Вернуться к результатам поиска броней"
+            className="back-button"
+            aria-label="Вернуться к результатам поиска броней"
           >
-            ← К результатам броней
+            <Icon name="arrowLeft" size="lg" className="back-icon" />
+            Вернуться к броням
           </button>
         ) : (
           <BackButton />

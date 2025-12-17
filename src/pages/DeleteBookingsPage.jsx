@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Icon } from '../components/Icons';
-import { useTheme } from '../context/ThemeContext';
 import { useSearch } from '../context/SearchContext';
 import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
@@ -67,7 +66,7 @@ const DeleteBookingsPage = () => {
       
       if (savedResults && savedResults.length > 0) {
         setSearchResults(savedResults);
-        setSuccess(`Найдено броней: ${savedResults.length} (восстановлено)`);
+        setSuccess(`Найдено броней: ${savedResults.length}`);
       }
     }
   };
@@ -260,9 +259,9 @@ const DeleteBookingsPage = () => {
   React.useEffect(() => {
     if (bookingsSearchState.searchType && bookingsSearchState.searchResults.length > 0) {
       // Предлагаем восстановить поиск
-      if (window.confirm('Восстановить последний поиск броней?')) {
+      // if (window.confirm('Восстановить последний поиск броней?')) {
         restoreSearchFromState();
-      }
+      // }
     }
   }, []);
 
@@ -270,18 +269,6 @@ const DeleteBookingsPage = () => {
     <div className="delete-bookings-container">
       <BackButton />
 
-      {/* Добавляем кнопку восстановления поиска */}
-      {bookingsSearchState.searchType && (
-        <div className="restore-search-banner">
-          <button 
-            onClick={restoreSearchFromState}
-            className="restore-search-button"
-          >
-            ↶ Восстановить последний поиск
-          </button>
-        </div>
-      )}
-      
       <div className="delete-bookings-header">
         <h1>Удаление броней</h1>
         <p className="page-subtitle">
@@ -432,6 +419,17 @@ const DeleteBookingsPage = () => {
           
         </div>
       </div>
+
+      {bookingsSearchState.searchType && (
+        <button 
+          onClick={restoreSearchFromState}
+          className="back-button"
+          aria-label="Восстановить последний поиск"
+        >
+          <Icon name="refresh" size="lg" className="back-icon" />
+          Восстановить последний поиск
+        </button>
+      )}
 
       {searchResults.length > 0 && (
         <div className="results-section">
