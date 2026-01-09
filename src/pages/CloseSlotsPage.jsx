@@ -685,7 +685,7 @@ const CloseSlotsPage = () => {
                 >
                   {availableTables[club].map(tableNum => (
                     <option key={tableNum} value={tableNum}>
-                      Стол {tableNum} {(tableNum === '7') ? '(WOOD ROOM)' : (tableNum === '8') ? '(DARK ROOM)' : ''}
+                      Стол {tableNum} {(tableNum === '8') ? '(WOOD ROOM)' : (tableNum === '7') ? '(DARK ROOM)' : ''}
                     </option>
                   ))}
                 </select>
