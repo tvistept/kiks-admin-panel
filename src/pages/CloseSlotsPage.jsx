@@ -26,8 +26,8 @@ const CloseSlotsPage = () => {
   
   // Список доступных столов для каждого клуба
   const availableTables = {
-    kiks1: ['3', '4', '5', '6'],
-    kiks2: ['3', '4', '6', '7', '8']
+    kiks1: ['3', '4', '5', '6', '-1'],
+    kiks2: ['3', '4', '6', '7', '8', '-1']
   };
 
   // Загрузка данных при открытии страницы
@@ -411,232 +411,232 @@ const CloseSlotsPage = () => {
 
   // Моковые данные для демонстрации (если API недоступно)
   const getMockData = () => [
-  {
-    "id": "2408",
-    "signature": "live_queue",
-    "date": "2025-12-13T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 14,
-    "table": 5,
-    "club": "kiks1"
-  },
-  {
-    "id": "2311",
-    "signature": "KIVACH",
-    "date": "2025-12-13T00:00:00.000Z",
-    "time": "18:00:00",
-    "hours": 5,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2409",
-    "signature": "live_queue",
-    "date": "2025-12-13T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 14,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2406",
-    "signature": "live_queue",
-    "date": "2025-12-13T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 14,
-    "table": 3,
-    "club": "kiks1"
-  },
-  {
-    "id": "2407",
-    "signature": "live_queue",
-    "date": "2025-12-13T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 14,
-    "table": 4,
-    "club": "kiks1"
-  },
-  {
-    "id": "2315",
-    "signature": "KIVACH",
-    "date": "2025-12-20T00:00:00.000Z",
-    "time": "19:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2756",
-    "signature": "HoReCa",
-    "date": "2025-12-22T00:00:00.000Z",
-    "time": "18:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2753",
-    "signature": "HoReCa",
-    "date": "2025-12-22T00:00:00.000Z",
-    "time": "18:00:00",
-    "hours": 4,
-    "table": 3,
-    "club": "kiks1"
-  },
-  {
-    "id": "2754",
-    "signature": "HoReCa",
-    "date": "2025-12-22T00:00:00.000Z",
-    "time": "18:00:00",
-    "hours": 4,
-    "table": 4,
-    "club": "kiks1"
-  },
-  {
-    "id": "2755",
-    "signature": "HoReCa",
-    "date": "2025-12-22T00:00:00.000Z",
-    "time": "18:00:00",
-    "hours": 4,
-    "table": 5,
-    "club": "kiks1"
-  },
-  {
-    "id": "2316",
-    "signature": "KIVACH",
-    "date": "2025-12-27T00:00:00.000Z",
-    "time": "19:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2428",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 4,
-    "club": "kiks2"
-  },
-  {
-    "id": "2430",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 7,
-    "club": "kiks2"
-  },
-  {
-    "id": "2431",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 8,
-    "club": "kiks2"
-  },
-  {
-    "id": "2423",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 3,
-    "club": "kiks1"
-  },
-  {
-    "id": "2425",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 5,
-    "club": "kiks1"
-  },
-  {
-    "id": "2424",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 4,
-    "club": "kiks1"
-  },
-  {
-    "id": "2426",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2427",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 3,
-    "club": "kiks2"
-  },
-  {
-    "id": "2429",
-    "signature": "day_off",
-    "date": "2026-01-01T00:00:00.000Z",
-    "time": "12:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks2"
-  },
-  {
-    "id": "2317",
-    "signature": "KIVACH",
-    "date": "2026-01-03T00:00:00.000Z",
-    "time": "19:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2318",
-    "signature": "KIVACH",
-    "date": "2026-01-10T00:00:00.000Z",
-    "time": "19:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2319",
-    "signature": "KIVACH",
-    "date": "2026-01-17T00:00:00.000Z",
-    "time": "19:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2320",
-    "signature": "KIVACH",
-    "date": "2026-01-24T00:00:00.000Z",
-    "time": "19:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  },
-  {
-    "id": "2321",
-    "signature": "KIVACH",
-    "date": "2026-01-31T00:00:00.000Z",
-    "time": "19:00:00",
-    "hours": 4,
-    "table": 6,
-    "club": "kiks1"
-  }
-]
+    {
+      "id": "2408",
+      "signature": "live_queue",
+      "date": "2025-12-13T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 14,
+      "table": 5,
+      "club": "kiks1"
+    },
+    {
+      "id": "2311",
+      "signature": "KIVACH",
+      "date": "2025-12-13T00:00:00.000Z",
+      "time": "18:00:00",
+      "hours": 5,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2409",
+      "signature": "live_queue",
+      "date": "2025-12-13T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 14,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2406",
+      "signature": "live_queue",
+      "date": "2025-12-13T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 14,
+      "table": 3,
+      "club": "kiks1"
+    },
+    {
+      "id": "2407",
+      "signature": "live_queue",
+      "date": "2025-12-13T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 14,
+      "table": 4,
+      "club": "kiks1"
+    },
+    {
+      "id": "2315",
+      "signature": "KIVACH",
+      "date": "2025-12-20T00:00:00.000Z",
+      "time": "19:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2756",
+      "signature": "HoReCa",
+      "date": "2025-12-22T00:00:00.000Z",
+      "time": "18:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2753",
+      "signature": "HoReCa",
+      "date": "2025-12-22T00:00:00.000Z",
+      "time": "18:00:00",
+      "hours": 4,
+      "table": 3,
+      "club": "kiks1"
+    },
+    {
+      "id": "2754",
+      "signature": "HoReCa",
+      "date": "2025-12-22T00:00:00.000Z",
+      "time": "18:00:00",
+      "hours": 4,
+      "table": 4,
+      "club": "kiks1"
+    },
+    {
+      "id": "2755",
+      "signature": "HoReCa",
+      "date": "2025-12-22T00:00:00.000Z",
+      "time": "18:00:00",
+      "hours": 4,
+      "table": 5,
+      "club": "kiks1"
+    },
+    {
+      "id": "2316",
+      "signature": "KIVACH",
+      "date": "2025-12-27T00:00:00.000Z",
+      "time": "19:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2428",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 4,
+      "club": "kiks2"
+    },
+    {
+      "id": "2430",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 7,
+      "club": "kiks2"
+    },
+    {
+      "id": "2431",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 8,
+      "club": "kiks2"
+    },
+    {
+      "id": "2423",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 3,
+      "club": "kiks1"
+    },
+    {
+      "id": "2425",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 5,
+      "club": "kiks1"
+    },
+    {
+      "id": "2424",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 4,
+      "club": "kiks1"
+    },
+    {
+      "id": "2426",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2427",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 3,
+      "club": "kiks2"
+    },
+    {
+      "id": "2429",
+      "signature": "day_off",
+      "date": "2026-01-01T00:00:00.000Z",
+      "time": "12:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks2"
+    },
+    {
+      "id": "2317",
+      "signature": "KIVACH",
+      "date": "2026-01-03T00:00:00.000Z",
+      "time": "19:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2318",
+      "signature": "KIVACH",
+      "date": "2026-01-10T00:00:00.000Z",
+      "time": "19:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2319",
+      "signature": "KIVACH",
+      "date": "2026-01-17T00:00:00.000Z",
+      "time": "19:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2320",
+      "signature": "KIVACH",
+      "date": "2026-01-24T00:00:00.000Z",
+      "time": "19:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    },
+    {
+      "id": "2321",
+      "signature": "KIVACH",
+      "date": "2026-01-31T00:00:00.000Z",
+      "time": "19:00:00",
+      "hours": 4,
+      "table": 6,
+      "club": "kiks1"
+    }
+  ]
 
   return (
     <div className="close-slots-container">
@@ -685,7 +685,8 @@ const CloseSlotsPage = () => {
                 >
                   {availableTables[club].map(tableNum => (
                     <option key={tableNum} value={tableNum}>
-                      Стол {tableNum} {(tableNum === '8') ? '(WOOD ROOM)' : (tableNum === '7') ? '(DARK ROOM)' : ''}
+                      {(tableNum === '8') ? 'WOOD ROOM' : (tableNum === '7') ? 'DARK ROOM' : (tableNum === '-1') ? 'Все столы': `Стол ${tableNum}`}
+                      {/* Стол {tableNum} {(tableNum === '8') ? '(WOOD ROOM)' : (tableNum === '7') ? '(DARK ROOM)' : ''} */}
                     </option>
                   ))}
                 </select>
