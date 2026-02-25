@@ -96,6 +96,7 @@ export const Icon = ({ name, size = 'lg', color, className = '', ...props }) => 
 // Компоненты для конкретных иконок (опционально)
 export const SearchIcon = (props) => <Icon name="search" {...props} />;
 export const CalendarXmarkIcon = (props) => <Icon name="calendarXmark" {...props} />;
+export const calendarDayIcon = (props) => <Icon name="calendarDay" {...props} />;
 export const ClockIcon = (props) => <Icon name="clock" {...props} />;
 export const TrashIcon = (props) => <Icon name="trash" {...props} />;
 export const ChartBarIcon = (props) => <Icon name="chartBar" {...props} />;

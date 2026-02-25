@@ -30,6 +30,14 @@ const AdminDashboard = ({ onLogout }) => {
       icon: 'calendarXmark'
     },
     {
+      id: 5,
+      title: 'Выходные дни',
+      description: 'Список дней по выходному расписанию',
+      path: '/admin/weekends',
+      color: '#8b5cf6',
+      icon: 'calendarDay'
+    },
+    {
       id: 3,
       title: 'Закрытие слотов',
       description: 'Закрытие слотов для бронирования',
@@ -45,14 +53,7 @@ const AdminDashboard = ({ onLogout }) => {
       color: '#ef4444',
       icon: 'trash'
     },
-    // {
-    //   id: 5,
-    //   title: '📊 Статистика',
-    //   description: 'Просмотр статистики посещений и доходов',
-    //   path: '/admin/stats',
-    //   color: '#8b5cf6',
-    //   icon: '📊'
-    // },
+    
     // {
     //   id: 6,
     //   title: '👥 Все пользователи',

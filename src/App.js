@@ -10,6 +10,7 @@ import PlaceholderPage from './pages/PlaceholderPage';
 import NonWorkingDaysPage from './pages/NonWorkingDaysPage';
 import CloseSlotsPage from './pages/CloseSlotsPage';
 import DeleteBookingsPage from './pages/DeleteBookingsPage';
+import WeekendsPage from './pages/WeekendsPage';
 import ScrollToTop from './components/ScrollToTop';
 import './styles/global.css';
 
@@ -62,13 +63,23 @@ function App() {
             />
             <Route 
               path="/admin/non-working" 
-            element={
-                isAuthenticated ? (
-                  <NonWorkingDaysPage />
-                ) : (
-                  <Navigate to="/login" />
-                )
-              } 
+              element={
+                  isAuthenticated ? (
+                    <NonWorkingDaysPage />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                } 
+            />
+            <Route 
+              path="/admin/weekends" 
+              element={
+                  isAuthenticated ? (
+                    <WeekendsPage />
+                  ) : (
+                    <Navigate to="/login" />
+                  )
+                } 
             />
             <Route 
               path="/admin/close-slots" 
