@@ -14,6 +14,14 @@ const AdminDashboard = ({ onLogout }) => {
 
   const menuItems = [
     {
+      id: 0,
+      title: 'Таблица броней',
+      description: 'Классическое отображение броней в виде таблицы',
+      path: '/admin/scheduler',
+      color: '#ec4899',
+      icon: 'calendarAlt'
+    },
+    {
       id: 1,
       title: 'Поиск посетителя',
       description: 'Поиск информации о посетителе по chat_id',

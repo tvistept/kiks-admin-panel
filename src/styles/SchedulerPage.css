@@ -1,0 +1,106 @@
+.scheduler{
+  padding:20px;
+  font-family: Arial, sans-serif;
+}
+
+.scheduler-table{
+  border-collapse: collapse;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  width:100%;
+  table-layout: fixed;
+}
+
+.scheduler-table th,
+.scheduler-table td{
+  border:1px solid #e5e7eb;
+  text-align:center;
+  padding:6px;
+  font-size:14px;
+}
+
+.scheduler-table th{
+  background:var(--color-card);
+  font-weight:600;
+  color: var(--color-text);
+}
+
+.table-number-cell{
+  background:var(--color-card);
+  font-weight:bold;
+  width:60px;
+  color: var(--color-text);
+  height: 50px;
+  position: sticky;
+  left: 0;
+  /* background: #d9d9d9; */
+  z-index: 2;
+  min-width: 70px;
+  font-weight: bold;
+}
+
+.booking-cell{
+  background:#fc8cc6;
+  color:#000;
+  /* font-weight:500; */
+  /* width:fit-content; */
+
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.free-cell{
+  background:#bae6fd;
+}
+
+.scheduler-wrapper {
+  width: 100%;
+  overflow: hidden;
+}
+
+.scheduler-scroll {
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.scheduler-table {
+  border-collapse: collapse;
+  min-width: 900px;
+}
+
+.scheduler-table th:first-child {
+  position: sticky;
+  left: 0;
+  /* background: #e6e6e6; */
+  z-index: 3;
+}
+
+@media (max-width: 768px) {
+
+  .scheduler-table th,
+  .scheduler-table td {
+    font-size: 12px;
+    /* padding: 6px; */
+    /* white-space: nowrap; */
+  }
+
+}
+
+.date-select {
+  padding: 12px 16px;
+  border: 2px solid var(--color-border);
+  border-radius: 8px;
+  font-size: 15px;
+  background-color: var(--color-card);
+  color: var(--color-text);
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.date-select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(244, 114, 182, 0.1);
+}

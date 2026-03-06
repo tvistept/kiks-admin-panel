@@ -5,6 +5,7 @@ import { SearchProvider } from './context/SearchContext';
 import { ThemeProvider } from './context/ThemeContext';
 import LoginPage from './pages/LoginPage';
 import AdminDashboard from './pages/AdminDashboard';
+import SchedulerPage from './pages/SchedulerPage';
 import SearchUserPage from './pages/SearchUserPage';
 import PlaceholderPage from './pages/PlaceholderPage';
 import NonWorkingDaysPage from './pages/NonWorkingDaysPage';
@@ -46,6 +47,16 @@ function App() {
               element={
                 isAuthenticated ? (
                   <AdminDashboard onLogout={handleLogout} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              } 
+            />
+            <Route 
+              path="/admin/scheduler"
+              element={
+                isAuthenticated ? (
+                  <SchedulerPage />
                 ) : (
                   <Navigate to="/login" />
                 )
