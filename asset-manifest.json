@@ -1,14 +1,14 @@
 {
   "files": {
-    "main.css": "/kiks-admin-panel/static/css/main.30df1805.css",
-    "main.js": "/kiks-admin-panel/static/js/main.b3a33b14.js",
+    "main.css": "/kiks-admin-panel/static/css/main.b48bdc49.css",
+    "main.js": "/kiks-admin-panel/static/js/main.869394f6.js",
     "static/media/kiks_logo.png": "/kiks-admin-panel/static/media/kiks_logo.17b2be01ed6aa653f816.png",
     "index.html": "/kiks-admin-panel/index.html",
-    "main.30df1805.css.map": "/kiks-admin-panel/static/css/main.30df1805.css.map",
-    "main.b3a33b14.js.map": "/kiks-admin-panel/static/js/main.b3a33b14.js.map"
+    "main.b48bdc49.css.map": "/kiks-admin-panel/static/css/main.b48bdc49.css.map",
+    "main.869394f6.js.map": "/kiks-admin-panel/static/js/main.869394f6.js.map"
   },
   "entrypoints": [
-    "static/css/main.30df1805.css",
-    "static/js/main.b3a33b14.js"
+    "static/css/main.b48bdc49.css",
+    "static/js/main.869394f6.js"
   ]
 }
