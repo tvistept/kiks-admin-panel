@@ -518,3 +518,142 @@
     font-size: 32px;
   }
 }
+
+/* Панель информации о пользователе */
+.user-details-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  background: var(--color-card, #ffffff);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--color-border, #e5e7eb);
+  overflow: hidden;
+  z-index: 1000;
+  animation: slideIn 0.2s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.user-details-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  background: var(--color-primary-light, #fce4f0);
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+
+.user-details-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--color-text, #1f2937);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text-light, #6b7280);
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+}
+
+.close-button:hover {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--color-text, #1f2937);
+}
+
+.user-details-content {
+  padding: 20px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.user-info p {
+  margin: 10px 0;
+  font-size: 14px;
+  color: var(--color-text, #1f2937);
+  word-break: break-word;
+}
+
+.user-info strong {
+  display: inline-block;
+  min-width: 120px;
+  color: var(--color-text-light, #4b5563);
+}
+
+.blocked-status {
+  color: #dc2626;
+  font-weight: 500;
+}
+
+.active-status {
+  color: #16a34a;
+  font-weight: 500;
+}
+
+.user-loading, .user-error {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--color-text-light, #6b7280);
+  font-size: 14px;
+}
+
+.user-error {
+  color: #dc2626;
+}
+
+/* Делаем ячейки с бронями кликабельными */
+.booking-cell.clickable {
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.booking-cell.clickable:hover {
+  background: #f9a8d4; /* чуть темнее при наведении */
+}
+
+/* Стили для маленького спиннера (если не определен) */
+.spinner-small {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-top-color: var(--color-primary, #f472b6);
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Адаптация для мобильных */
+@media (max-width: 768px) {
+  .user-details-panel {
+    left: 10px;
+    right: 10px;
+    bottom: 10px;
+    width: auto;
+  }
+}

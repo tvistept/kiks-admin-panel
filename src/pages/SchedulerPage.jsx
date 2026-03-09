@@ -1,3 +1,4 @@
+// SchedulerPage.jsx (дополненный)
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useSearch } from '../context/SearchContext';
@@ -77,6 +78,12 @@ const SchedulerPage = () => {
   // Состояние для хранения доступных дат
   const [dateOptions, setDateOptions] = useState([]);
 
+  // Состояния для панели информации о пользователе
+  const [selectedUser, setSelectedUser] = useState(null);
+  const [showUserDetails, setShowUserDetails] = useState(false);
+  const [loadingUser, setLoadingUser] = useState(false);
+  const [userError, setUserError] = useState('');
+
   // Получаем актуальный список столов для выбранного клуба
   const tables = TABLES_CONFIG[searchClub] || TABLES_CONFIG.kiks1;
 
@@ -142,6 +149,39 @@ const SchedulerPage = () => {
     }
   }, [searchClub, searchDate]);
 
+  // Функция загрузки данных пользователя по chat_id
+  const handleUserClick = async (chatId) => {
+    if (!chatId) return;
+    
+    setLoadingUser(true);
+    setUserError('');
+    setSelectedUser(null);
+    setShowUserDetails(true); // Показываем панель сразу, даже до загрузки
+    
+    try {
+      const response = await fetch(`${API_BASE_URL}/get-user?chat_id=${chatId}`);
+      
+      if (!response.ok) {
+        throw new Error('Ошибка загрузки данных пользователя');
+      }
+      
+      const userData = await response.json();
+      setSelectedUser(userData);
+    } catch (err) {
+      setUserError(err.message);
+      console.error('Ошибка при загрузке пользователя:', err);
+    } finally {
+      setLoadingUser(false);
+    }
+  };
+
+  // Функция закрытия панели
+  const closeUserDetails = () => {
+    setShowUserDetails(false);
+    setSelectedUser(null);
+    setUserError('');
+  };
+
   // Группировка броней по столам для отображения
   const bookingsByTable = {};
   tables.forEach((t) => {
@@ -154,6 +194,13 @@ const SchedulerPage = () => {
   // Функция для получения названия клуба
   const getClubName = (clubId) => {
     return clubId === 'kiks1' ? 'на Марата' : 'на Каменноостровском';
+  };
+
+  // Форматирование даты регистрации (если приходит в ISO формате)
+  const formatRegistrationDate = (dateString) => {
+    if (!dateString) return '—';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('ru-RU');
   };
 
   return (
@@ -279,8 +326,9 @@ const SchedulerPage = () => {
                             <td 
                               key={h} 
                               colSpan={span} 
-                              className="booking-cell" 
+                              className="booking-cell clickable" 
                               title={`${booking.user_name} (ID: ${booking.booking_id}, ${booking.hours}ч)`}
+                              onClick={() => handleUserClick(booking.chat_id)}
                             >
                               {booking.user_name}
                             </td>
@@ -297,6 +345,42 @@ const SchedulerPage = () => {
           )}
         </div>
       </div>
+
+      {/* Панель детальной информации о пользователе */}
+      {showUserDetails && (
+        <div className="user-details-panel">
+          <div className="user-details-header">
+            <h3>Информация о пользователе</h3>
+            <button className="close-button" onClick={closeUserDetails}>×</button>
+          </div>
+          <div className="user-details-content">
+            {loadingUser && (
+              <div className="user-loading">
+                <span className="spinner-small"></span> Загрузка...
+              </div>
+            )}
+            {userError && (
+              <div className="user-error">{userError}</div>
+            )}
+            {selectedUser && !loadingUser && !userError && (
+              <div className="user-info">
+                <p><strong>Chat ID:</strong> {selectedUser.chat_id || '—'}</p>
+                <p><strong>Телефон:</strong> {selectedUser.phone || '—'}</p>
+                <p><strong>Telegram:</strong> {selectedUser.telegram_username || selectedUser.username || '—'}</p>
+                <p><strong>Дата регистрации:</strong> {formatRegistrationDate(selectedUser.registration_date || selectedUser.createdAt)}</p>
+                <p><strong>Статус блокировки:</strong> {
+                  selectedUser.is_blocked 
+                    ? <span className="blocked-status">Заблокирован</span> 
+                    : <span className="active-status">Активен</span>
+                }</p>
+              </div>
+            )}
+            {!loadingUser && !selectedUser && !userError && (
+              <p>Нет данных о пользователе</p>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
