@@ -364,12 +364,13 @@ const SchedulerPage = () => {
             )}
             {selectedUser && !loadingUser && !userError && (
               <div className="user-info">
+                <p><strong>Имя:</strong> {selectedUser.firstName || '—'}</p>
                 <p><strong>Chat ID:</strong> {selectedUser.chat_id || '—'}</p>
                 <p><strong>Телефон:</strong> {selectedUser.phone || '—'}</p>
-                <p><strong>Telegram:</strong> {selectedUser.telegram_username || selectedUser.username || '—'}</p>
-                <p><strong>Дата регистрации:</strong> {formatRegistrationDate(selectedUser.registration_date || selectedUser.createdAt)}</p>
-                <p><strong>Статус блокировки:</strong> {
-                  selectedUser.is_blocked 
+                <p><strong>Telegram:</strong> {selectedUser.user_name ||'—'}</p>
+                <p><strong>Дата регистрации:</strong> {formatRegistrationDate(selectedUser.createdAt)}</p>
+                <p> {
+                  selectedUser.blocked_status 
                     ? <span className="blocked-status">Заблокирован</span> 
                     : <span className="active-status">Активен</span>
                 }</p>
