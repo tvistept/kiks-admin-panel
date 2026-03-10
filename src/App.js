@@ -12,6 +12,7 @@ import NonWorkingDaysPage from './pages/NonWorkingDaysPage';
 import CloseSlotsPage from './pages/CloseSlotsPage';
 import DeleteBookingsPage from './pages/DeleteBookingsPage';
 import WeekendsPage from './pages/WeekendsPage';
+import AnalyticsPage from './pages/AnalyticsPage';
 import ScrollToTop from './components/ScrollToTop';
 import './styles/global.css';
 
@@ -57,6 +58,16 @@ function App() {
               element={
                 isAuthenticated ? (
                   <SchedulerPage />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              } 
+            />
+            <Route 
+              path="/admin/analytics"
+              element={
+                isAuthenticated ? (
+                  <AnalyticsPage />
                 ) : (
                   <Navigate to="/login" />
                 )

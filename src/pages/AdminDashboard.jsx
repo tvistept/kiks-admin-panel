@@ -23,6 +23,14 @@ const AdminDashboard = ({ onLogout }) => {
     },
     {
       id: 1,
+      title: 'Аналитика',
+      description: 'Прикольные таблички и графики для анализа работы бильярдного клуба',
+      path: '/admin/analytics',
+      color: '#99ec48',
+      icon: 'chartBar'
+    },
+    {
+      id: 2,
       title: 'Поиск посетителя',
       description: 'Поиск информации о посетителе по chat_id',
       path: '/admin/search',
@@ -30,7 +38,7 @@ const AdminDashboard = ({ onLogout }) => {
       icon: 'search'
     },
     {
-      id: 2,
+      id: 3,
       title: 'Нерабочие дни',
       description: 'Создание нерабочих дней в клубе',
       path: '/admin/non-working',
@@ -38,7 +46,7 @@ const AdminDashboard = ({ onLogout }) => {
       icon: 'calendarXmark'
     },
     {
-      id: 5,
+      id: 4,
       title: 'Выходные дни',
       description: 'Список дней по выходному расписанию',
       path: '/admin/weekends',
@@ -46,7 +54,7 @@ const AdminDashboard = ({ onLogout }) => {
       icon: 'calendarDay'
     },
     {
-      id: 3,
+      id: 5,
       title: 'Закрытие слотов',
       description: 'Закрытие слотов для бронирования',
       path: '/admin/close-slots',
@@ -54,22 +62,13 @@ const AdminDashboard = ({ onLogout }) => {
       icon: 'ban'
     },
     {
-      id: 4,
+      id: 6,
       title: 'Удаление броней',
       description: 'Удаление существующих броней',
       path: '/admin/delete-bookings',
       color: '#ef4444',
       icon: 'trash'
     },
-    
-    // {
-    //   id: 6,
-    //   title: '👥 Все пользователи',
-    //   description: 'Просмотр списка всех пользователей',
-    //   path: '/admin/users',
-    //   color: '#ec4899',
-    //   icon: '👥'
-    // }
   ];
 
   return (
@@ -103,22 +102,17 @@ const AdminDashboard = ({ onLogout }) => {
         <div className="welcome-section">
           <div className="welcome-card">
             <div className="welcome-content">
-              {/* <h2>Салют!</h2> */}
               <p>
                 Используй меню ниже для управления различными аспектами работы бильярдного клуба.
                 Все изменения сохраняются автоматически.
               </p>
             </div>
-            <div className="welcome-stats">
+            {/* <div className="welcome-stats">
               <div className="stat-item">
                 <span className="stat-number">42</span>
                 <span className="stat-label">активных броней</span>
               </div>
-              {/* <div className="stat-item">
-                <span className="stat-number">156</span>
-                <span className="stat-label">пользователей</span>
-              </div> */}
-            </div>
+            </div> */}
           </div>
         </div>
 
