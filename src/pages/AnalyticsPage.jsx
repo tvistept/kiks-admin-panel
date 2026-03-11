@@ -217,7 +217,7 @@ const AnalyticsPage = () => {
       {stats && (
         <div className="stats-cards">
           <div className="stat-card club1">
-            <h3>Клуб на Марата</h3>
+            <h3>Марата</h3>
             <div className="stat-values">
               <div className="stat-item">
                 <span className="stat-label">Среднее:</span>
@@ -234,7 +234,7 @@ const AnalyticsPage = () => {
             </div>
           </div>
           <div className="stat-card club2">
-            <h3>Клуб на Каменноостровском</h3>
+            <h3>Каменноостровский</h3>
             <div className="stat-values">
               <div className="stat-item">
                 <span className="stat-label">Среднее:</span>
@@ -286,9 +286,11 @@ const AnalyticsPage = () => {
               verticalAlign="top" 
               height={36}
               formatter={(value) => {
-                return value === 'k1_tb' || value === 'k1_th' 
-                  ? 'Клуб на Марата' 
-                  : 'Клуб на Каменноостровском';
+                // console.log(value);
+                return value
+                // return value === 'k1_tb' || value === 'k1_th' 
+                //   ? 'Марата' 
+                //   : 'Каменноостровский';
               }}
             />
             {showBrush && (
@@ -333,8 +335,8 @@ const AnalyticsPage = () => {
             <thead>
               <tr>
                 <th>Дата</th>
-                <th colSpan="2">Клуб на Марата</th>
-                <th colSpan="2">Клуб на Каменноостровском</th>
+                <th colSpan="2">Марата</th>
+                <th colSpan="2">Каменноостровский</th>
               </tr>
               <tr>
                 <th></th>

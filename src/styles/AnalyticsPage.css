@@ -62,7 +62,7 @@
 }
 
 .stat-card {
-  background: var(--color-card, #ffffff);
+  background: var(--color-card);
   border-radius: 12px;
   padding: 20px;
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
@@ -112,7 +112,7 @@
 
 /* Контейнер для графика */
 .chart-container {
-  background: var(--color-card, #ffffff);
+  background: var(--color-card);
   border-radius: 12px;
   padding: 20px;
   margin-bottom: 30px;
@@ -291,36 +291,5 @@
 
   .brush-toggle {
     font-size: 12px;
-  }
-}
-
-/* Темная тема (если поддерживается) */
-@media (prefers-color-scheme: dark) {
-  .stat-card {
-    background: #1f2937;
-    border-color: #374151;
-  }
-
-  .chart-container,
-  .data-table-container {
-    background: #1f2937;
-    border-color: #374151;
-  }
-
-  .analytics-table th {
-    background: #111827;
-  }
-
-  .analytics-table tfoot td {
-    background: #111827;
-  }
-
-  .analytics-table tbody tr:hover {
-    background: #374151;
-  }
-
-  .custom-tooltip {
-    background: #1f2937;
-    border-color: #374151;
   }
 }
