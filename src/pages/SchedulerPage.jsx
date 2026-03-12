@@ -268,6 +268,23 @@ const SchedulerPage = () => {
           </div>
         </div>
 
+        <div className="button-group">
+            <button 
+              onClick={(e) => fetchBookings(searchClub, searchDate)}
+              className="search-button"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="spinner"></span>
+                  Обновление...
+                </>
+              ) : (
+                'Обновить данные'
+              )}
+            </button>
+          </div>
+
         {error && (
           <div className="error-message">
             {error}

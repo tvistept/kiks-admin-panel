@@ -13,58 +13,7 @@ import {
 import BackButton from '../components/BackButton';
 import '../styles/AnalyticsPage.css';
 
-// Данные из файла (в реальном проекте здесь будет fetch)
-const bookingsWeekData = [
-  {
-    "booking_date": "04-03-2026",
-    "k1_tb": 28,
-    "k1_th": 44,
-    "k2_tb": 17,
-    "k2_th": 29
-  },
-  {
-    "booking_date": "05-03-2026",
-    "k1_tb": 29,
-    "k1_th": 40,
-    "k2_tb": 24,
-    "k2_th": 41
-  },
-  {
-    "booking_date": "06-03-2026",
-    "k1_tb": 29,
-    "k1_th": 44,
-    "k2_tb": 24,
-    "k2_th": 39
-  },
-  {
-    "booking_date": "07-03-2026",
-    "k1_tb": 35,
-    "k1_th": 52,
-    "k2_tb": 34,
-    "k2_th": 58
-  },
-  {
-    "booking_date": "08-03-2026",
-    "k1_tb": 42,
-    "k1_th": 55,
-    "k2_tb": 44,
-    "k2_th": 65
-  },
-  {
-    "booking_date": "09-03-2026",
-    "k1_tb": 32,
-    "k1_th": 47,
-    "k2_tb": 35,
-    "k2_th": 56
-  },
-  {
-    "booking_date": "10-03-2026",
-    "k1_tb": 20,
-    "k1_th": 32,
-    "k2_tb": 16,
-    "k2_th": 26
-  }
-];
+const API_BASE_URL = 'https://kiks-app.ru:5000/api';
 
 // Функция для форматирования даты из ДД-ММ-ГГГГ в более читаемый вид
 const formatDate = (dateStr) => {
@@ -79,10 +28,13 @@ const CustomTooltip = ({ active, payload, label }) => {
       <div className="custom-tooltip">
         <p className="tooltip-date">{label}</p>
         {payload.map((entry, index) => {
-          const clubName = entry.dataKey === 'k1_tb' ? 'Марата' : 'Каменноостровский';
+          const clubName = entry.dataKey === 'k1_tb' || entry.dataKey === 'k1_th' 
+            ? 'Марата' 
+            : 'Каменноостровский';
+          const metricType = entry.dataKey.includes('_tb') ? 'броней' : 'часов';
           return (
             <p key={index} className="tooltip-value" style={{ color: entry.color }}>
-              {clubName}: {entry.value} броней
+              {clubName}: {entry.value} {metricType}
             </p>
           );
         })}
@@ -100,36 +52,37 @@ const AnalyticsPage = () => {
   const [showBrush, setShowBrush] = useState(true);
 
   useEffect(() => {
-    // Имитация загрузки данных (в реальном проекте здесь будет fetch)
-    const loadData = async () => {
+    const fetchAnalytics = async () => {
       try {
         setLoading(true);
-        // Здесь будет реальный запрос к API
-        // const response = await fetch(`${API_BASE_URL}/analytics/week-bookings`);
-        // const result = await response.json();
+        setError('');
         
-        // Пока используем локальные данные
-        setTimeout(() => {
-          // Добавляем форматированную дату для отображения
-          const formattedData = bookingsWeekData.map(item => ({
-            ...item,
-            formattedDate: formatDate(item.booking_date),
-            fullDate: item.booking_date
-          }));
-          setData(formattedData);
-          setLoading(false);
-        }, 500); // Имитация задержки
+        const response = await fetch(`${API_BASE_URL}/get-kiks-analytics`);
+        
+        if (!response.ok) {
+          throw new Error(`Ошибка загрузки: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        
+        // Добавляем форматированную дату для отображения
+        const formattedData = result.map(item => ({
+          ...item,
+          formattedDate: formatDate(item.booking_date),
+          fullDate: item.booking_date
+        }));
+        
+        setData(formattedData);
       } catch (err) {
-        setError('Ошибка загрузки данных');
+        setError(`Ошибка загрузки данных аналитики: ${err.message}` || 'Ошибка загрузки данных аналитики');
+        console.error('Ошибка при загрузке аналитики:', err);
+      } finally {
         setLoading(false);
       }
     };
 
-    loadData();
-  }, []);
-
-  // Получаем уникальные даты для оси X
-  const xAxisDates = data.map(item => item.formattedDate);
+    fetchAnalytics();
+  }, []); // Пустой массив зависимостей - запрос при монтировании
 
   // Функция для переключения метрики
   const toggleMetric = (metric) => {
@@ -179,10 +132,21 @@ const AnalyticsPage = () => {
       <div className="analytics-container">
         <BackButton />
         <div className="error-state">
-          <p>{error}</p>
+          <p className="error-message">{error}</p>
           <button onClick={() => window.location.reload()} className="retry-button">
             Повторить
           </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (data.length === 0) {
+    return (
+      <div className="analytics-container">
+        <BackButton />
+        <div className="empty-state">
+          <p>Нет данных для отображения</p>
         </div>
       </div>
     );
@@ -221,11 +185,11 @@ const AnalyticsPage = () => {
             <div className="stat-values">
               <div className="stat-item">
                 <span className="stat-label">Среднее:</span>
-                <span className="stat-value">{selectedMetric === 'tb' ? stats.k1Avg : (stats.k1Avg * 1).toFixed(1)}</span>
+                <span className="stat-value">{stats.k1Avg}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-label">Всего:</span>
-                <span className="stat-value">{selectedMetric === 'tb' ? stats.k1Total : stats.k1Total}</span>
+                <span className="stat-value">{stats.k1Total}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-label">Максимум:</span>
@@ -238,11 +202,11 @@ const AnalyticsPage = () => {
             <div className="stat-values">
               <div className="stat-item">
                 <span className="stat-label">Среднее:</span>
-                <span className="stat-value">{selectedMetric === 'tb' ? stats.k2Avg : (stats.k2Avg * 1).toFixed(1)}</span>
+                <span className="stat-value">{stats.k2Avg}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-label">Всего:</span>
-                <span className="stat-value">{selectedMetric === 'tb' ? stats.k2Total : stats.k2Total}</span>
+                <span className="stat-value">{stats.k2Total}</span>
               </div>
               <div className="stat-item">
                 <span className="stat-label">Максимум:</span>
@@ -255,7 +219,7 @@ const AnalyticsPage = () => {
 
       <div className="chart-container">
         <div className="chart-header">
-          <h2>Динамика броней по дням</h2>
+          <h2>Динамика {selectedMetric === 'tb' ? 'броней' : 'часов'} по дням</h2>
           <label className="brush-toggle">
             <input 
               type="checkbox" 
@@ -285,13 +249,6 @@ const AnalyticsPage = () => {
             <Legend 
               verticalAlign="top" 
               height={36}
-              formatter={(value) => {
-                // console.log(value);
-                return value
-                // return value === 'k1_tb' || value === 'k1_th' 
-                //   ? 'Марата' 
-                //   : 'Каменноостровский';
-              }}
             />
             {showBrush && (
               <Brush 

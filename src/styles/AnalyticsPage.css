@@ -1,5 +1,5 @@
 .analytics-container {
-  padding: 20px;
+  padding: 40px;
   max-width: 1400px;
   margin: 0 auto;
   min-height: 100vh;
@@ -7,8 +7,7 @@
 }
 
 .analytics-header {
-  margin-bottom: 30px;
-  padding: 20px 0;
+  margin-bottom: 20px;
 }
 
 .analytics-header h1 {

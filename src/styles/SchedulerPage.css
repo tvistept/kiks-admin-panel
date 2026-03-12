@@ -51,7 +51,7 @@
 }
 
 .free-cell{
-  background:#bae6fd;
+  background:var(--color-free-cell);
 }
 
 .scheduler-wrapper {

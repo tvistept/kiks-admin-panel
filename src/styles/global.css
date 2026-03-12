@@ -9,6 +9,7 @@
   --color-text: var(--color-black);
   --color-card: var(--color-white);
   --color-border: #e5e7eb;
+  --color-free-cell:var(--color-secondary);
 }
 
 .dark-theme {
@@ -21,6 +22,7 @@
   --color-text: var(--color-black);
   --color-card: #1e293b;       /* Темные карточки */
   --color-border: #374151;
+  --color-free-cell:#1e293b;
 }
 
 body {
