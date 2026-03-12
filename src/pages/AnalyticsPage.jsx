@@ -93,8 +93,8 @@ const AnalyticsPage = () => {
   const calculateStats = () => {
     if (data.length === 0) return null;
 
-    const k1Values = data.map(item => selectedMetric === 'tb' ? item.k1_tb : item.k1_th);
-    const k2Values = data.map(item => selectedMetric === 'tb' ? item.k2_tb : item.k2_th);
+    const k1Values = data.map(item => selectedMetric === 'tb' ? parseFloat(item.k1_tb) : parseFloat(item.k1_th));
+    const k2Values = data.map(item => selectedMetric === 'tb' ? parseFloat(item.k2_tb) : parseFloat(item.k2_th));
 
     const k1Avg = (k1Values.reduce((a, b) => a + b, 0) / k1Values.length).toFixed(1);
     const k2Avg = (k2Values.reduce((a, b) => a + b, 0) / k2Values.length).toFixed(1);
