@@ -317,10 +317,10 @@ const AnalyticsPage = () => {
             <tfoot>
               <tr>
                 <td><strong>Итого</strong></td>
-                <td><strong>{data.reduce((acc, item) => acc + parseFloat(item.k1_tb), 0)}</strong></td>
-                <td><strong>{data.reduce((acc, item) => acc + parseFloat(item.k1_th), 0)}</strong></td>
-                <td><strong>{data.reduce((acc, item) => acc + parseFloat(item.k2_tb), 0)}</strong></td>
-                <td><strong>{data.reduce((acc, item) => acc + parseFloat(item.k2_th), 0)}</strong></td>
+                <td><strong>{data.reduce((acc, item) => parseFloat(acc) + parseFloat(item.k1_tb), 0)}</strong></td>
+                <td><strong>{data.reduce((acc, item) => parseFloat(acc) + parseFloat(item.k1_th), 0)}</strong></td>
+                <td><strong>{data.reduce((acc, item) => parseFloat(acc) + parseFloat(item.k2_tb), 0)}</strong></td>
+                <td><strong>{data.reduce((acc, item) => parseFloat(acc) + parseFloat(item.k2_th), 0)}</strong></td>
               </tr>
             </tfoot>
           </table>
