@@ -5,7 +5,7 @@ import { useSearch } from '../context/SearchContext';
 import BackButton from '../components/BackButton';
 import '../styles/SchedulerPage.css';
 
-const API_BASE_URL = 'https://kiks-app.ru:5000/api';
+const API_BASE_URL = 'https://kiks.space:5000/api';
 const START = 12;
 const END = 26; // 02:00 следующего дня
 
