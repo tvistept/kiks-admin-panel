@@ -27,7 +27,8 @@ const CloseSlotsPage = () => {
   // Список доступных столов для каждого клуба
   const availableTables = {
     kiks1: ['3', '4', '5', '6', '-1'],
-    kiks2: ['3', '4', '6', '7', '8', '-1']
+    kiks2: ['3', '4', '6', '7', '8', '-1'],
+    kiks3: ['2', '3', '4', '-1']
   };
 
   // Загрузка данных при открытии страницы
@@ -669,6 +670,7 @@ const CloseSlotsPage = () => {
                 >
                   <option value="kiks1">ул. Марата</option>
                   <option value="kiks2">Каменноостровский пр.</option>
+                  <option value="kiks3">Севкабель</option>
                 </select>
               </div>
 

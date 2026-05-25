@@ -12,7 +12,8 @@ const END = 26; // 02:00 следующего дня
 // Конфигурация столов для каждого клуба
 const TABLES_CONFIG = {
   kiks1: [3, 4, 5, 6],
-  kiks2: [3, 4, 6, 7, 8]
+  kiks2: [3, 4, 6, 7, 8],
+  kiks3: [2, 3, 4],
 };
 
 // Вспомогательная функция для форматирования даты в ДД.ММ.ГГГГ
@@ -193,7 +194,14 @@ const SchedulerPage = () => {
 
   // Функция для получения названия клуба
   const getClubName = (clubId) => {
-    return clubId === 'kiks1' ? 'на Марата' : 'на Каменноостровском';
+    let clubName = '';
+    switch (clubId) {
+      case 'kiks1': clubName = 'на Марата'; break;
+      case 'kiks2': clubName = 'на Каменноостровском'; break;
+      case 'kiks3': clubName = 'в Севкабелe'; break;
+      default: clubName = '';
+    }
+    return clubName;
   };
 
   // Форматирование даты регистрации (если приходит в ISO формате)
@@ -232,6 +240,7 @@ const SchedulerPage = () => {
               >
                 <option value="kiks1">Марата (столы: 3, 4, 5, 6)</option>
                 <option value="kiks2">Каменноостровский (столы: 3, 4, 6, 7, 8)</option>
+                <option value="kiks3">Севкабель (столы: 2, 3, 4)</option>
               </select>
             </div>
 

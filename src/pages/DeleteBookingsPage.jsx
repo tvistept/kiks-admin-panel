@@ -312,6 +312,7 @@ const DeleteBookingsPage = () => {
                       <option value="all">Все клубы</option>
                       <option value="kiks1">Марата</option>
                       <option value="kiks2">Каменноостровский</option>
+                      <option value="kiks3">Севкабель</option>
                     </select>
                   </div>
 
