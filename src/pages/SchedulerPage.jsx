@@ -117,7 +117,7 @@ const SchedulerPage = () => {
       setApiBookings(results);
       
       if (results.length === 0) {
-        const clubText = club === 'kiks1' ? 'на Марата' : 'на Каменноостровском';
+        const clubText = getClubName(club);
         setError(`Брони на ${date} в клубе ${clubText} не найдены`);
       } else {
         setSuccess(`Найдено броней: ${results.length}`);
