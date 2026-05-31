@@ -4,7 +4,7 @@ import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/CloseSlotsPage.css';
 import { Icon } from '../components/Icons';
-const API_BASE_URL = 'https://kiks.space:5000/api';
+const API_BASE_URL = 'https://kiks.space:8443/api';
 
 const CloseSlotsPage = () => {
   // const { isDarkMode } = useTheme();

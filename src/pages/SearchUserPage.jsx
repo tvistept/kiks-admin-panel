@@ -3,7 +3,7 @@ import { useLocation, useNavigate  } from 'react-router-dom';
 import { Icon } from '../components/Icons';
 import BackButton from '../components/BackButton';
 import '../styles/SearchUserPage.css';
-const API_BASE_URL = 'https://kiks.space:5000/api';
+const API_BASE_URL = 'https://kiks.space:8443/api';
 
 const SearchUserPage = () => {
 //   const { isDarkMode } = useTheme();

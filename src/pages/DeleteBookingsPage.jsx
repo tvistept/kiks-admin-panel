@@ -6,7 +6,7 @@ import BackButton from '../components/BackButton';
 import ConfirmDialog from '../components/ConfirmDialog';
 import '../styles/DeleteBookingsPage.css';
 
-const API_BASE_URL = 'https://kiks.space:5000/api';
+const API_BASE_URL = 'https://kiks.space:8443/api';
 
 const DeleteBookingsPage = () => {
   const { saveBookingsSearch, bookingsSearchState } = useSearch();

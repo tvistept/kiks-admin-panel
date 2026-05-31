@@ -13,7 +13,7 @@ import {
 import BackButton from '../components/BackButton';
 import '../styles/AnalyticsPage.css';
 
-const API_BASE_URL = 'https://kiks.space:5000/api';
+const API_BASE_URL = 'https://kiks.space:8443/api';
 
 // Функция для форматирования даты из ДД-ММ-ГГГГ в более читаемый вид
 const formatDate = (dateStr) => {
