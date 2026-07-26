@@ -26,7 +26,7 @@ const CloseSlotsPage = () => {
   
   // Список доступных столов для каждого клуба
   const availableTables = {
-    kiks1: ['3', '4', '5', '6', '-1'],
+    kiks1: ['3', '4', '5', '6', '7', '-1'],
     kiks2: ['3', '4', '6', '7', '8', '-1'],
     kiks3: ['2', '3', '4', '-1']
   };
@@ -687,7 +687,7 @@ const CloseSlotsPage = () => {
                 >
                   {availableTables[club].map(tableNum => (
                     <option key={tableNum} value={tableNum}>
-                      {(tableNum === '8') ? 'WOOD ROOM' : (tableNum === '7') ? 'DARK ROOM' : (tableNum === '-1') ? 'Все столы': `Стол ${tableNum}`}
+                      {(tableNum === '8') ? 'WOOD ROOM' : (tableNum === '7' && club === 'kiks2') ? 'DARK ROOM' : (tableNum === '-1') ? 'Все столы': `Стол ${tableNum}`}
                       {/* Стол {tableNum} {(tableNum === '8') ? '(WOOD ROOM)' : (tableNum === '7') ? '(DARK ROOM)' : ''} */}
                     </option>
                   ))}
