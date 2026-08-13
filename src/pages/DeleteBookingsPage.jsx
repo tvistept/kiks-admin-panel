@@ -313,6 +313,7 @@ const DeleteBookingsPage = () => {
                       <option value="kiks1">Марата</option>
                       <option value="kiks2">Каменноостровский</option>
                       <option value="kiks3">Севкабель</option>
+                      <option value="kiks4">Некикс</option>
                     </select>
                   </div>
 
