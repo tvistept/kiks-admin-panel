@@ -59,9 +59,9 @@ const LoginPage = ({ onLogin }) => {
           </button>
         </form>
         
-        <div className="login-hint">
+        {/* <div className="login-hint">
           <p>Для демонстрации используй код: <strong>admin123</strong></p>
-        </div>
+        </div> */}
       </div>
     </div>
   );

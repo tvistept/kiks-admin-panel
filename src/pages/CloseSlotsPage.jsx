@@ -27,7 +27,7 @@ const CloseSlotsPage = () => {
   // Список доступных столов для каждого клуба
   const availableTables = {
     kiks1: ['3', '4', '5', '6', '7', '-1'],
-    kiks2: ['3', '4', '6', '7', '8', '-1'],
+    kiks2: ['3', '4', '5', '6', '7', '8', '-1'],
     kiks3: ['3', '4', '5', '6', '-1'],
     kiks4: ['3', '4', '5', '-1']
   };
@@ -373,6 +373,19 @@ const CloseSlotsPage = () => {
     const trimmed = time.substring(0, 5);
     return trimmed;
   }
+
+  // Функция для получения названия клуба
+  const getClubName = (clubId) => {
+    let clubName = '';
+    switch (clubId) {
+      case 'kiks1': clubName = 'на Марата'; break;
+      case 'kiks2': clubName = 'на Каменноостровском'; break;
+      case 'kiks3': clubName = 'в Севкабелe'; break;
+      case 'kiks4': clubName = 'в Некиксе'; break;
+      default: clubName = '';
+    }
+    return clubName;
+  };
 
   // Получение сегодняшней даты в нужном формате
   // const getTodayDate = () => {
@@ -849,7 +862,7 @@ const CloseSlotsPage = () => {
               <div key={slot.id} className="slot-item">
                 <div className="slot-main">
                   <div className="slot-header">
-                    <span className="slot-club">{slot.club === 'kiks1' ? 'ул. Марата' : 'Каменноостровский пр.'}</span>
+                    <span className="slot-club">{getClubName(slot.club)}</span>
                     <span className="slot-table">Стол {slot.table}</span>
                     {slot.signature && (
                       <div className="slot-signature">

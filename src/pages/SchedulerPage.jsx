@@ -12,7 +12,7 @@ const END = 26; // 02:00 следующего дня
 // Конфигурация столов для каждого клуба
 const TABLES_CONFIG = {
   kiks1: [3, 4, 5, 6, 7],
-  kiks2: [3, 4, 6, 7, 8],
+  kiks2: [3, 4, 5, 6, 7, 8],
   kiks3: [3, 4, 5, 6],
   kiks4: [3, 4, 5],
 };
@@ -242,7 +242,7 @@ const SchedulerPage = () => {
                 disabled={loading}
               >
                 <option value="kiks1">Марата (столы: 3, 4, 5, 6, 7)</option>
-                <option value="kiks2">Каменноостровский (столы: 3, 4, 6, 7, 8)</option>
+                <option value="kiks2">Каменноостровский (столы: 3, 4, 5, 6, 7, 8)</option>
                 <option value="kiks3">Севкабель (столы: 3, 4, 5, 6)</option>
                 <option value="kiks4">Некикс (столы: 3, 4, 5)</option>
               </select>
